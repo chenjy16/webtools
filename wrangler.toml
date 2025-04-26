@@ -1,0 +1,9 @@
+name = "webtools"
+
+[site]
+bucket = "./dist"
+entry-point = "dist"
+
+[build]
+command = "npm run build"
+
