@@ -2,7 +2,7 @@ name = "webtools"
 
 [site]
 bucket = "./dist"
-entry-point = "dist"
+# entry-point = "dist"  <-- 删除此行
 
 [build]
 command = "npm run build"
