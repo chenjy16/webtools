@@ -1,8 +1,11 @@
 name = "webtools"
 
+# 添加兼容性日期配置
+compatibility_date = "2025-04-26"
+
 [site]
 bucket = "./dist"
-# entry-point = "dist"  <-- 删除此行
+entry-point = "workers-site"
 
 [build]
 command = "npm run build"
