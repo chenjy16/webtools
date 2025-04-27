@@ -1,174 +1,163 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import AdBanner from '../components/AdBanner';
-import { 
-  AppBar, 
-  Box, 
-  CssBaseline, 
-  Divider, 
-  Drawer, 
-  IconButton, 
-  List, 
-  ListItem, 
-  ListItemButton, 
-  ListItemIcon, 
-  ListItemText, 
-  Toolbar, 
-  Typography, 
-  useMediaQuery, 
-  useTheme 
+import Footer from '../components/Footer';
+import {
+  AppBar,
+  Box,
+  CssBaseline,
+  Divider,
+  Drawer,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Toolbar,
+  Typography,
+  useMediaQuery,
+  useTheme,
+  Switch
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import PasswordIcon from '@mui/icons-material/Password';
-import CodeIcon from '@mui/icons-material/Code';
-// 移除 ImageIcon 导入
-// import ImageIcon from '@mui/icons-material/Image';
-import SecurityIcon from '@mui/icons-material/Security';
-// 移除 InsertDriveFileIcon 导入
-// import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-import QrCodeIcon from '@mui/icons-material/QrCode';
-import LinkIcon from '@mui/icons-material/Link';
-import FingerprintIcon from '@mui/icons-material/Fingerprint';
-import ColorLensIcon from '@mui/icons-material/ColorLens';
-import PublicIcon from '@mui/icons-material/Public';
-// 新增图标导入
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import DateRangeIcon from '@mui/icons-material/DateRange';
-import CodeOffIcon from '@mui/icons-material/CodeOff';
-import TimerIcon from '@mui/icons-material/Timer';
-import FormatIndentIncreaseIcon from '@mui/icons-material/FormatIndentIncrease';
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 
 const drawerWidth = 240;
 
-const tools = [
-  { name: '密码生成器', path: '/password-generator', icon: <PasswordIcon /> },
-  { name: 'JSON格式化', path: '/json-formatter', icon: <CodeIcon /> },
-  // 移除图片转换菜单项
-  // { name: '图片转换', path: '/image-converter', icon: <ImageIcon /> },
-  { name: 'HMAC计算器', path: '/hmac-calculator', icon: <SecurityIcon /> },
-  // 移除文件转换菜单项
-  // { name: '文件转换', path: '/file-converter', icon: <InsertDriveFileIcon /> },
-  { name: '二维码生成器', path: '/qrcode-generator', icon: <QrCodeIcon /> },
-  { name: 'URL编码/解码', path: '/url-encoder', icon: <LinkIcon /> },
-  { name: 'Base64转换', path: '/base64-converter', icon: <CodeIcon /> },
-  { name: '哈希计算器', path: '/hash-calculator', icon: <FingerprintIcon /> },
-  { name: '颜色转换', path: '/color-converter', icon: <ColorLensIcon /> },
-  { name: 'IP 地址查询', path: '/ip-lookup', icon: <PublicIcon /> },
-  // 新增工具菜单项
-  { name: 'JWT 解码器', path: '/jwt-decoder', icon: <VpnKeyIcon /> },
-  { name: '日期计算器', path: '/date-calculator', icon: <DateRangeIcon /> },
-  { name: '正则表达式测试', path: '/regex-tester', icon: <CodeOffIcon /> },
-  { name: '计时器工具', path: '/timer', icon: <TimerIcon /> },
-  { name: '代码美化/压缩', path: '/code-formatter', icon: <FormatIndentIncreaseIcon /> },
-  { name: '单位换算工具', path: '/unit-converter', icon: <SwapHorizIcon /> },
+const toolData = [
+  { name: 'Password Generator', path: '/password-generator', icon: lazy(() => import('@mui/icons-material/Password')) },
+  { name: 'JSON Formatter', path: '/json-formatter', icon: lazy(() => import('@mui/icons-material/Code')) },
+  { name: 'HMAC Calculator', path: '/hmac-calculator', icon: lazy(() => import('@mui/icons-material/Security')) },
+  { name: 'QR Code Generator', path: '/qrcode-generator', icon: lazy(() => import('@mui/icons-material/QrCode')) },
+  { name: 'URL Encoder/Decoder', path: '/url-encoder', icon: lazy(() => import('@mui/icons-material/Link')) },
+  { name: 'Base64 Converter', path: '/base64-converter', icon: lazy(() => import('@mui/icons-material/Code')) },
+  { name: 'Hash Calculator', path: '/hash-calculator', icon: lazy(() => import('@mui/icons-material/Fingerprint')) },
+  { name: 'Color Converter', path: '/color-converter', icon: lazy(() => import('@mui/icons-material/ColorLens')) },
+  { name: 'IP Address Lookup', path: '/ip-lookup', icon: lazy(() => import('@mui/icons-material/Public')) },
+  { name: 'JWT Decoder', path: '/jwt-decoder', icon: lazy(() => import('@mui/icons-material/VpnKey')) },
+  { name: 'Date Calculator', path: '/date-calculator', icon: lazy(() => import('@mui/icons-material/DateRange')) },
+  { name: 'Regex Tester', path: '/regex-tester', icon: lazy(() => import('@mui/icons-material/CodeOff')) },
+  { name: 'Timer Tool', path: '/timer', icon: lazy(() => import('@mui/icons-material/Timer')) },
+  { name: 'Code Formatter/Minifier', path: '/code-formatter', icon: lazy(() => import('@mui/icons-material/FormatIndentIncrease')) },
+  { name: 'Unit Converter', path: '/unit-converter', icon: lazy(() => import('@mui/icons-material/SwapHoriz')) },
 ];
 
 export default function MainLayout() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
   const location = useLocation();
+  const currentTool = toolData.find(t => t.path === location.pathname) || { name: 'Web Tools', path: '/' };
+  const firstFocusableElement = useRef(null);
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
+  useEffect(() => {
+    if (mobileOpen && firstFocusableElement.current) {
+      firstFocusableElement.current.focus();
+    }
+  }, [mobileOpen]);
+
+  const baseName = 'Web Tools - Free Online Developer Utilities';
+  const title = currentTool.path === '/' ? baseName : `${currentTool.name} | ${baseName}`;
+  const descriptions = {
+    '/password-generator': 'Generate secure, random passwords with customizable options.',
+    '/json-formatter': 'Format, beautify, and validate JSON data easily.',
+    '/jwt-decoder': 'Decode and inspect JSON Web Tokens quickly.',
   };
+  const description = descriptions[currentTool.path] || 'Collection of free online web tools for developers and designers.';
+
+  const handleDrawerToggle = () => setMobileOpen(prev => !prev);
+  const handleThemeToggle = () => setDarkMode(prev => !prev);
 
   const drawer = (
-    <div>
+    <Box sx={{ width: drawerWidth, height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Toolbar>
-        <Typography variant="h6" noWrap component="div">
-          网页小工具
-        </Typography>
+        <Typography variant="h6">Web Tools</Typography>
       </Toolbar>
       <Divider />
-      <List>
-        {tools.map((tool) => (
-          <ListItem key={tool.path} disablePadding>
-            <ListItemButton 
-              component={Link} 
-              to={tool.path}
-              selected={location.pathname === tool.path}
-            >
-              <ListItemIcon>
-                {tool.icon}
-              </ListItemIcon>
-              <ListItemText primary={tool.name} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </div>
+      <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
+        <List>
+          {toolData.map((tool, index) => (
+            <ListItem key={tool.path} disablePadding>
+              <ListItemButton
+                component={Link}
+                to={tool.path}
+                selected={location.pathname === tool.path}
+                ref={index === 0 ? firstFocusableElement : null}
+              >
+                <ListItemIcon>
+                  <Suspense fallback={<div />}>{<tool.icon />}</Suspense>
+                </ListItemIcon>
+                <ListItemText primary={tool.name} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Box>
+    </Box>
   );
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: darkMode ? 'grey.900' : 'background.default', color: darkMode ? 'grey.100' : 'text.primary' }}>
+      <Helmet>
+        <title>{title}</title>
+        <meta name="description" content={description} />
+      </Helmet>
       <CssBaseline />
-      <AppBar
-        position="fixed"
-        sx={{
-          width: { md: `calc(100% - ${drawerWidth}px)` },
-          ml: { md: `${drawerWidth}px` },
-        }}
-      >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { md: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            {tools.find(tool => tool.path === location.pathname)?.name || '网页小工具'}
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Box
-        component="nav"
-        sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
-      >
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-          }}
-        >
-          {drawer}
-        </Drawer>
+
+      {!isMobile && (
         <Drawer
           variant="permanent"
-          sx={{
-            display: { xs: 'none', md: 'block' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-          }}
           open
+          role="navigation"
+          aria-label="Tool navigation"
+          sx={{ '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth } }}
         >
           {drawer}
         </Drawer>
-      </Box>
-      <Box
-        component="main"
-        sx={{ flexGrow: 1, p: 3, width: { md: `calc(100% - ${drawerWidth}px)` } }}
-      >
-        <Toolbar />
-        
-        {/* 顶部横幅广告 */}
-        <AdBanner slot="1234567890" format="horizontal" />
-        
-        {/* 页面内容 */}
-        <Outlet />
-        
-        {/* 底部横幅广告 */}
-        <AdBanner slot="0987654321" format="horizontal" />
+      )}
+
+      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        <AppBar position="fixed">
+          <Toolbar>
+            {isMobile && (
+              <IconButton color="inherit" edge="start" onClick={handleDrawerToggle} sx={{ mr: 2 }}>
+                <MenuIcon />
+              </IconButton>
+            )}
+            <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>{currentTool.name}</Typography>
+            <IconButton color="inherit" onClick={handleThemeToggle}>
+              {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+
+        {isMobile && (
+          <Drawer
+            variant="temporary"
+            open={mobileOpen}
+            onClose={handleDrawerToggle}
+            ModalProps={{ keepMounted: true }}
+            role="navigation"
+            aria-label="Tool navigation"
+            sx={{ '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth } }}
+          >
+            {drawer}
+          </Drawer>
+        )}
+
+        <Box sx={{ pt: 8, p: 2, overflowY: 'auto', flexGrow: 1 }}>
+          <AdBanner slot="1234567890" format={isMobile ? 'vertical' : 'horizontal'} />
+          <Box sx={{ mt: 2 }}><Outlet /></Box>
+          <Box sx={{ mt: 2 }}><AdBanner slot="0987654321" format={isMobile ? 'vertical' : 'horizontal'} /></Box>
+        </Box>
+
+        <Box component="footer">
+          <Footer />
+        </Box>
       </Box>
     </Box>
   );

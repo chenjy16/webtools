@@ -33,32 +33,32 @@ export default function ColorConverter() {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
-  // 处理颜色输入变化
+  // Handle color input change
   const handleColorInputChange = (e) => {
     const value = e.target.value;
     setColorInput(value);
     convertColor(value, activeTab);
   };
 
-  // 处理标签页切换
+  // Handle tab change
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
     convertColor(colorInput, newValue);
   };
 
-  // 颜色转换函数
+  // Color conversion function
   const convertColor = (value, format) => {
     try {
       setError('');
       let hex, rgb, hsl;
 
-      // 根据当前选择的格式解析颜色
+      // Parse color based on the currently selected format
       if (format === 0) { // HEX
         if (!value.startsWith('#')) {
           value = '#' + value;
         }
         if (!/^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$/.test(value)) {
-          throw new Error('无效的HEX颜色格式');
+          throw new Error('Invalid HEX color format');
         }
         hex = value;
         rgb = hexToRgb(hex);
@@ -66,13 +66,13 @@ export default function ColorConverter() {
       } else if (format === 1) { // RGB
         const rgbMatch = value.match(/^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/);
         if (!rgbMatch) {
-          throw new Error('无效的RGB颜色格式，请使用rgb(r, g, b)格式');
+          throw new Error('Invalid RGB color format, please use rgb(r, g, b)');
         }
         const r = parseInt(rgbMatch[1], 10);
         const g = parseInt(rgbMatch[2], 10);
         const b = parseInt(rgbMatch[3], 10);
         if (r > 255 || g > 255 || b > 255) {
-          throw new Error('RGB值必须在0-255之间');
+          throw new Error('RGB values must be between 0-255');
         }
         rgb = { r, g, b };
         hex = rgbToHex(r, g, b);
@@ -80,20 +80,20 @@ export default function ColorConverter() {
       } else if (format === 2) { // HSL
         const hslMatch = value.match(/^hsl\(\s*(\d+)\s*,\s*(\d+)%\s*,\s*(\d+)%\s*\)$/);
         if (!hslMatch) {
-          throw new Error('无效的HSL颜色格式，请使用hsl(h, s%, l%)格式');
+          throw new Error('Invalid HSL color format, please use hsl(h, s%, l%)');
         }
         const h = parseInt(hslMatch[1], 10);
         const s = parseInt(hslMatch[2], 10);
         const l = parseInt(hslMatch[3], 10);
         if (h > 360 || s > 100 || l > 100) {
-          throw new Error('HSL值超出范围');
+          throw new Error('HSL values are out of range');
         }
         hsl = { h, s, l };
         rgb = hslToRgb(h, s, l);
         hex = rgbToHex(rgb.r, rgb.g, rgb.b);
       }
 
-      // 更新所有颜色值
+      // Update all color values
       setHexValue(hex);
       setRgbValue(`rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`);
       setHslValue(`hsl(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%)`);
@@ -102,17 +102,17 @@ export default function ColorConverter() {
     }
   };
 
-  // HEX转RGB
+  // HEX to RGB
   const hexToRgb = (hex) => {
-    // 移除#号
+    // Remove # sign
     hex = hex.replace('#', '');
 
-    // 处理3位HEX
+    // Handle 3-digit HEX
     if (hex.length === 3) {
       hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
     }
 
-    // 解析RGB值
+    // Parse RGB values
     const r = parseInt(hex.substring(0, 2), 16);
     const g = parseInt(hex.substring(2, 4), 16);
     const b = parseInt(hex.substring(4, 6), 16);
@@ -120,12 +120,12 @@ export default function ColorConverter() {
     return { r, g, b };
   };
 
-  // RGB转HEX
+  // RGB to HEX
   const rgbToHex = (r, g, b) => {
     return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
   };
 
-  // RGB转HSL
+  // RGB to HSL
   const rgbToHsl = (r, g, b) => {
     r /= 255;
     g /= 255;
@@ -136,7 +136,7 @@ export default function ColorConverter() {
     let h, s, l = (max + min) / 2;
 
     if (max === min) {
-      h = s = 0; // 灰色
+      h = s = 0; // grayscale
     } else {
       const d = max - min;
       s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
@@ -153,7 +153,7 @@ export default function ColorConverter() {
     return { h: h * 360, s: s * 100, l: l * 100 };
   };
 
-  // HSL转RGB
+  // HSL to RGB
   const hslToRgb = (h, s, l) => {
     h /= 360;
     s /= 100;
@@ -162,7 +162,7 @@ export default function ColorConverter() {
     let r, g, b;
 
     if (s === 0) {
-      r = g = b = l; // 灰色
+      r = g = b = l; // grayscale
     } else {
       const hue2rgb = (p, q, t) => {
         if (t < 0) t += 1;
@@ -184,13 +184,13 @@ export default function ColorConverter() {
     return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
   };
 
-  // 复制到剪贴板
+  // Copy to clipboard
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    showSnackbar('已复制到剪贴板', 'success');
+    showSnackbar('Copied to clipboard', 'success');
   };
 
-  // 清除所有
+  // Clear all
   const clearAll = () => {
     setColorInput('');
     setHexValue('');
@@ -199,21 +199,21 @@ export default function ColorConverter() {
     setError('');
   };
 
-  // 显示提示消息
+  // Show snackbar message
   const showSnackbar = (message, severity) => {
     setSnackbarMessage(message);
     setSnackbarSeverity(severity);
     setSnackbarOpen(true);
   };
 
-  // 使用示例颜色
+  // Use example color
   const useExampleColor = () => {
     const examples = [
-      '#1976d2', // 蓝色
-      '#f44336', // 红色
-      '#4caf50', // 绿色
-      '#ff9800', // 橙色
-      '#9c27b0'  // 紫色
+      '#1976d2', // Blue
+      '#f44336', // Red
+      '#4caf50', // Green
+      '#ff9800', // Orange
+      '#9c27b0'  // Purple
     ];
     const randomExample = examples[Math.floor(Math.random() * examples.length)];
     setColorInput(randomExample);
@@ -223,10 +223,10 @@ export default function ColorConverter() {
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', p: 2 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        颜色转换工具
+        Color Converter Tool
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        在HEX、RGB和HSL颜色格式之间进行转换，支持实时预览。
+        Convert between HEX, RGB, and HSL color formats with live preview.
       </Typography>
 
       <Grid container spacing={3}>
@@ -234,7 +234,7 @@ export default function ColorConverter() {
           <Card sx={{ height: '100%' }}>
             <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-                <Tabs value={activeTab} onChange={handleTabChange} aria-label="颜色格式选项卡">
+                <Tabs value={activeTab} onChange={handleTabChange} aria-label="Color format tabs">
                   <Tab label="HEX" />
                   <Tab label="RGB" />
                   <Tab label="HSL" />
@@ -247,7 +247,7 @@ export default function ColorConverter() {
                 onChange={handleColorInputChange}
                 placeholder={activeTab === 0 ? '#RRGGBB' : activeTab === 1 ? 'rgb(r, g, b)' : 'hsl(h, s%, l%)'}
                 error={!!error}
-                helperText={error || '输入颜色值，格式取决于选择的标签页'}
+                helperText={error || 'Enter color value, format depends on the selected tab'}
                 sx={{ mb: 3 }}
               />
               
@@ -257,7 +257,7 @@ export default function ColorConverter() {
                   startIcon={<ColorLensIcon />}
                   onClick={useExampleColor}
                 >
-                  使用示例颜色
+                  Use Example Color
                 </Button>
                 <Button
                   variant="outlined"
@@ -265,7 +265,7 @@ export default function ColorConverter() {
                   startIcon={<DeleteIcon />}
                   onClick={clearAll}
                 >
-                  清除
+                  Clear
                 </Button>
               </Box>
               
@@ -282,7 +282,7 @@ export default function ColorConverter() {
                   }}
                 >
                   <Typography variant="h6" sx={{ color: '#ffffff', textShadow: '0px 0px 2px rgba(0,0,0,0.7)' }}>
-                    颜色预览
+                    Color Preview
                   </Typography>
                 </Paper>
               </Box>
@@ -294,7 +294,7 @@ export default function ColorConverter() {
           <Card sx={{ height: '100%' }}>
             <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Typography variant="h6" gutterBottom>
-                转换结果
+                Conversion Results
               </Typography>
               
               <Box sx={{ mb: 2 }}>
@@ -360,7 +360,7 @@ export default function ColorConverter() {
                 disabled={!hexValue}
                 fullWidth
               >
-                复制所有格式
+                Copy All Formats
               </Button>
             </CardContent>
           </Card>

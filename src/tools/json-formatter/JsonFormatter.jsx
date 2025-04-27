@@ -30,20 +30,20 @@ export default function JsonFormatter() {
 
   const formatJson = () => {
     if (!input.trim()) {
-      setError('请输入JSON数据');
+      setError('Please enter JSON data');
       setOutput('');
       return;
     }
 
     try {
-      // 尝试解析JSON
+      // Try parsing JSON
       const parsedJson = JSON.parse(input);
-      // 格式化JSON
+      // Format JSON
       const formattedJson = JSON.stringify(parsedJson, null, indentSize);
       setOutput(formattedJson);
       setError('');
     } catch (err) {
-      setError(`JSON解析错误: ${err.message}`);
+      setError(`JSON parsing error: ${err.message}`);
       setOutput('');
     }
   };
@@ -51,7 +51,7 @@ export default function JsonFormatter() {
   const copyToClipboard = () => {
     if (output) {
       navigator.clipboard.writeText(output);
-      showSnackbar('JSON已复制到剪贴板', 'success');
+      showSnackbar('JSON copied to clipboard', 'success');
     }
   };
 
@@ -69,9 +69,9 @@ export default function JsonFormatter() {
 
   const handleSampleData = () => {
     const sampleJson = {
-      name: "JSON格式化工具",
+      name: "JSON Formatter Tool",
       version: "1.0.0",
-      features: ["格式化", "压缩", "验证"],
+      features: ["Format", "Minify", "Validate"],
       settings: {
         indentSize: 2,
         theme: "light"
@@ -79,30 +79,52 @@ export default function JsonFormatter() {
       isActive: true,
       downloads: 1234
     };
-    setInput(JSON.stringify(sampleJson));
+    // Use JSON.stringify with indentation for readability in the input field
+    setInput(JSON.stringify(sampleJson, null, 2));
   };
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto', p: 2 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        JSON格式化工具
+    <Box
+      sx={{
+        maxWidth: 900,
+        mx: 'auto',
+        p: { xs: 1, sm: 3 },
+        mt: { xs: 1, sm: 4 },
+        mb: { xs: 2, sm: 4 },
+        background: { xs: 'none', sm: '#f7f9fa' },
+        borderRadius: { xs: 0, sm: 3 },
+        boxShadow: { xs: 'none', sm: '0 4px 24px 0 rgba(0,0,0,0.06)' },
+        minHeight: '70vh'
+      }}
+    >
+      <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 700 }}>
+        JSON Formatter Tool
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        格式化、美化和验证JSON数据，使其更易于阅读和编辑。
+        Format, beautify, and validate JSON data to make it easier to read and edit.
       </Typography>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={3} alignItems="stretch">
         <Grid item xs={12} md={6}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Card
+            sx={{
+              height: '100%',
+              borderRadius: 3,
+              boxShadow: '0 2px 12px 0 rgba(0,0,0,0.04)',
+              background: '#fff',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="h6">输入JSON</Typography>
-                <Button 
-                  size="small" 
+                <Typography variant="h6">Input JSON</Typography>
+                <Button
+                  size="small"
                   onClick={handleSampleData}
                   startIcon={<FormatColorFillIcon />}
                 >
-                  示例数据
+                  Sample Data
                 </Button>
               </Box>
               <TextField
@@ -111,23 +133,23 @@ export default function JsonFormatter() {
                 rows={15}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="在此粘贴您的JSON数据..."
+                placeholder="Paste your JSON data here..."
                 error={!!error}
                 helperText={error}
                 sx={{ mb: 2, flexGrow: 1 }}
               />
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <FormControl sx={{ minWidth: 120 }}>
-                  <InputLabel id="indent-size-label">缩进大小</InputLabel>
+                  <InputLabel id="indent-size-label">Indent Size</InputLabel>
                   <Select
                     labelId="indent-size-label"
                     value={indentSize}
-                    label="缩进大小"
+                    label="Indent Size"
                     onChange={(e) => setIndentSize(e.target.value)}
                   >
-                    <MenuItem value={2}>2空格</MenuItem>
-                    <MenuItem value={4}>4空格</MenuItem>
-                    <MenuItem value={8}>8空格</MenuItem>
+                    <MenuItem value={2}>2 Spaces</MenuItem>
+                    <MenuItem value={4}>4 Spaces</MenuItem>
+                    <MenuItem value={8}>8 Spaces</MenuItem>
                   </Select>
                 </FormControl>
                 <Box>
@@ -137,7 +159,7 @@ export default function JsonFormatter() {
                     onClick={formatJson}
                     sx={{ mr: 1 }}
                   >
-                    格式化
+                    Format
                   </Button>
                   <Button
                     variant="outlined"
@@ -145,7 +167,7 @@ export default function JsonFormatter() {
                     onClick={clearAll}
                     startIcon={<DeleteIcon />}
                   >
-                    清除
+                    Clear
                   </Button>
                 </Box>
               </Box>
@@ -154,10 +176,19 @@ export default function JsonFormatter() {
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Card
+            sx={{
+              height: '100%',
+              borderRadius: 3,
+              boxShadow: '0 2px 12px 0 rgba(0,0,0,0.04)',
+              background: '#fafbfc',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="h6">格式化结果</Typography>
+                <Typography variant="h6">Formatted Result</Typography>
                 <IconButton onClick={copyToClipboard} disabled={!output}>
                   <ContentCopyIcon />
                 </IconButton>
@@ -168,9 +199,9 @@ export default function JsonFormatter() {
                 rows={15}
                 value={output}
                 InputProps={{ readOnly: true }}
-                placeholder="格式化后的JSON将显示在这里..."
-                sx={{ 
-                  mb: 2, 
+                placeholder="Formatted JSON will be displayed here..."
+                sx={{
+                  mb: 2,
                   flexGrow: 1,
                   fontFamily: 'monospace',
                   '& .MuiInputBase-input': { fontFamily: 'monospace' }

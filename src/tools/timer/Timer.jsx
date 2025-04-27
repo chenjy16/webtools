@@ -48,18 +48,18 @@ export default function Timer() {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [alarmTriggered, setAlarmTriggered] = useState(false);
-  
+
   const audioRef = useRef(null);
   const intervalRef = useRef(null);
   const stopwatchIntervalRef = useRef(null);
 
   useEffect(() => {
-    // 创建音频元素
+    // Create audio element
     audioRef.current = new Audio('/alarm.mp3');
     audioRef.current.loop = true;
-    
+
     return () => {
-      // 清理定时器和音频
+      // Clean up timers and audio
       clearInterval(intervalRef.current);
       clearInterval(stopwatchIntervalRef.current);
       if (audioRef.current) {
@@ -73,19 +73,19 @@ export default function Timer() {
     setActiveTab(newValue);
   };
 
-  // 倒计时相关函数
+  // Countdown timer functions
   const startTimer = () => {
     if (totalSeconds <= 0) return;
-    
+
     setIsRunning(true);
     setAlarmTriggered(false);
-    
+
     const startTime = Date.now() - (timeElapsed * 1000);
-    
+
     intervalRef.current = setInterval(() => {
       const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
       setTimeElapsed(elapsedSeconds);
-      
+
       if (elapsedSeconds >= totalSeconds) {
         clearInterval(intervalRef.current);
         setIsRunning(false);
@@ -115,7 +115,7 @@ export default function Timer() {
 
   const playAlarm = () => {
     if (audioRef.current) {
-      audioRef.current.play().catch(e => console.error('播放音频失败:', e));
+      audioRef.current.play().catch(e => console.error('Failed to play audio:', e));
     }
   };
 
@@ -126,11 +126,11 @@ export default function Timer() {
     }
   };
 
-  // 秒表相关函数
+  // Stopwatch functions
   const startStopwatch = () => {
     setStopwatchRunning(true);
     const startTime = Date.now() - (stopwatchTime * 1000);
-    
+
     stopwatchIntervalRef.current = setInterval(() => {
       setStopwatchTime(Math.floor((Date.now() - startTime) / 1000));
     }, 100);
@@ -153,7 +153,7 @@ export default function Timer() {
     const lapNumber = laps.length + 1;
     const previousLapTime = laps.length > 0 ? laps[laps.length - 1].totalSeconds : 0;
     const lapDuration = stopwatchTime - previousLapTime;
-    
+
     setLaps([
       ...laps,
       {
@@ -165,22 +165,22 @@ export default function Timer() {
     ]);
   };
 
-  // 格式化时间
+  // Format time
   const formatTime = (totalSeconds) => {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
-    
+
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  // 计算倒计时剩余时间
+  // Calculate remaining time for countdown
   const getRemainingTime = () => {
     const remaining = Math.max(0, totalSeconds - timeElapsed);
     return formatTime(remaining);
   };
 
-  // 计算倒计时进度百分比
+  // Calculate countdown progress percentage
   const getProgress = () => {
     if (totalSeconds === 0) return 0;
     const progress = (timeElapsed / totalSeconds) * 100;
@@ -189,7 +189,7 @@ export default function Timer() {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    showSnackbar('已复制到剪贴板', 'success');
+    showSnackbar('Copied to clipboard', 'success');
   };
 
   const showSnackbar = (message, severity) => {
@@ -205,20 +205,20 @@ export default function Timer() {
   return (
     <Box sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        计时器工具
+        Timer Tool
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        倒计时和秒表功能，帮助您精确计时。
+        Countdown and stopwatch functions to help you keep accurate time.
       </Typography>
 
-      {/* 工具上方广告 */}
+      {/* Ad above the tool */}
       <AdBanner slot="7788990011" />
 
       <Card sx={{ mb: 4, boxShadow: 3 }}>
         <CardContent>
           <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 3 }}>
-            <Tab icon={<AlarmIcon />} label="倒计时" />
-            <Tab icon={<TimerIcon />} label="秒表" />
+            <Tab icon={<AlarmIcon />} label="Countdown" />
+            <Tab icon={<TimerIcon />} label="Stopwatch" />
           </Tabs>
 
           {activeTab === 0 && (
@@ -227,7 +227,7 @@ export default function Timer() {
                 <Grid item xs={4}>
                   <TextField
                     fullWidth
-                    label="小时"
+                    label="Hours"
                     type="number"
                     value={hours}
                     onChange={(e) => setHours(Math.max(0, parseInt(e.target.value) || 0))}
@@ -238,7 +238,7 @@ export default function Timer() {
                 <Grid item xs={4}>
                   <TextField
                     fullWidth
-                    label="分钟"
+                    label="Minutes"
                     type="number"
                     value={minutes}
                     onChange={(e) => setMinutes(Math.max(0, parseInt(e.target.value) || 0))}
@@ -249,7 +249,7 @@ export default function Timer() {
                 <Grid item xs={4}>
                   <TextField
                     fullWidth
-                    label="秒"
+                    label="Seconds"
                     type="number"
                     value={seconds}
                     onChange={(e) => setSeconds(Math.max(0, parseInt(e.target.value) || 0))}
@@ -257,7 +257,7 @@ export default function Timer() {
                     disabled={isRunning}
                   />
                 </Grid>
-                
+
                 <Grid item xs={12}>
                   <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 2 }}>
                     {!isRunning ? (
@@ -269,7 +269,7 @@ export default function Timer() {
                         disabled={totalSeconds <= 0}
                         sx={{ minWidth: '120px' }}
                       >
-                        开始
+                        Start
                       </Button>
                     ) : (
                       <Button
@@ -279,7 +279,7 @@ export default function Timer() {
                         onClick={pauseTimer}
                         sx={{ minWidth: '120px' }}
                       >
-                        暂停
+                        Pause
                       </Button>
                     )}
                     <Button
@@ -288,7 +288,7 @@ export default function Timer() {
                       onClick={resetTimer}
                       sx={{ minWidth: '120px' }}
                     >
-                      重置
+                      Reset
                     </Button>
                     {alarmTriggered && (
                       <Button
@@ -297,19 +297,19 @@ export default function Timer() {
                         onClick={stopAlarm}
                         sx={{ minWidth: '120px' }}
                       >
-                        停止闹铃
+                        Stop Alarm
                       </Button>
                     )}
                   </Box>
                 </Grid>
               </Grid>
 
-              <Paper 
-                elevation={3} 
-                sx={{ 
-                  p: 4, 
-                  mt: 3, 
-                  borderRadius: 2, 
+              <Paper
+                elevation={3}
+                sx={{
+                  p: 4,
+                  mt: 3,
+                  borderRadius: 2,
                   backgroundColor: '#fafafa',
                   textAlign: 'center'
                 }}
@@ -317,13 +317,13 @@ export default function Timer() {
                 <Typography variant="h1" sx={{ fontFamily: 'monospace', fontSize: '4rem' }}>
                   {getRemainingTime()}
                 </Typography>
-                
+
                 <Box sx={{ width: '100%', mt: 2 }}>
-                  <LinearProgress 
-                    variant="determinate" 
-                    value={getProgress()} 
-                    sx={{ 
-                      height: 10, 
+                  <LinearProgress
+                    variant="determinate"
+                    value={getProgress()}
+                    sx={{
+                      height: 10,
                       borderRadius: 5,
                       backgroundColor: '#e0e0e0',
                       '& .MuiLinearProgress-bar': {
@@ -332,10 +332,10 @@ export default function Timer() {
                     }}
                   />
                 </Box>
-                
+
                 {alarmTriggered && (
                   <Typography variant="h6" color="error" sx={{ mt: 2 }}>
-                    时间到！
+                    Time's up!
                   </Typography>
                 )}
               </Paper>
@@ -344,11 +344,11 @@ export default function Timer() {
 
           {activeTab === 1 && (
             <Box>
-              <Paper 
-                elevation={3} 
-                sx={{ 
-                  p: 4, 
-                  borderRadius: 2, 
+              <Paper
+                elevation={3}
+                sx={{
+                  p: 4,
+                  borderRadius: 2,
                   backgroundColor: '#fafafa',
                   textAlign: 'center'
                 }}
@@ -356,7 +356,7 @@ export default function Timer() {
                 <Typography variant="h1" sx={{ fontFamily: 'monospace', fontSize: '4rem' }}>
                   {formatTime(stopwatchTime)}
                 </Typography>
-                
+
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 3 }}>
                   {!stopwatchRunning ? (
                     <Button
@@ -366,7 +366,7 @@ export default function Timer() {
                       onClick={startStopwatch}
                       sx={{ minWidth: '120px' }}
                     >
-                      开始
+                      Start
                     </Button>
                   ) : (
                     <Button
@@ -376,7 +376,7 @@ export default function Timer() {
                       onClick={pauseStopwatch}
                       sx={{ minWidth: '120px' }}
                     >
-                      暂停
+                      Pause
                     </Button>
                   )}
                   <Button
@@ -385,7 +385,7 @@ export default function Timer() {
                     onClick={resetStopwatch}
                     sx={{ minWidth: '120px' }}
                   >
-                    重置
+                    Reset
                   </Button>
                   <Button
                     variant="outlined"
@@ -395,24 +395,24 @@ export default function Timer() {
                     disabled={!stopwatchRunning}
                     sx={{ minWidth: '120px' }}
                   >
-                    记录分段
+                    Lap
                   </Button>
                 </Box>
               </Paper>
-              
+
               {laps.length > 0 && (
                 <Paper elevation={2} sx={{ mt: 3, borderRadius: 2 }}>
                   <List dense>
                     <ListItem sx={{ backgroundColor: '#f5f5f5' }}>
                       <Grid container>
                         <Grid item xs={2}>
-                          <Typography variant="subtitle2" color="text.secondary">分段</Typography>
+                          <Typography variant="subtitle2" color="text.secondary">Lap</Typography>
                         </Grid>
                         <Grid item xs={5}>
-                          <Typography variant="subtitle2" color="text.secondary">分段时间</Typography>
+                          <Typography variant="subtitle2" color="text.secondary">Lap Time</Typography>
                         </Grid>
                         <Grid item xs={5}>
-                          <Typography variant="subtitle2" color="text.secondary">总时间</Typography>
+                          <Typography variant="subtitle2" color="text.secondary">Total Time</Typography>
                         </Grid>
                       </Grid>
                     </ListItem>
@@ -440,7 +440,7 @@ export default function Timer() {
         </CardContent>
       </Card>
 
-      {/* 工具下方广告 */}
+      {/* Ad below the tool */}
       <AdBanner slot="7788990011" />
 
       <Snackbar
@@ -448,8 +448,8 @@ export default function Timer() {
         autoHideDuration={3000}
         onClose={() => setSnackbarOpen(false)}
       >
-        <Alert 
-          onClose={() => setSnackbarOpen(false)} 
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
           severity={snackbarSeverity}
           sx={{ width: '100%' }}
         >

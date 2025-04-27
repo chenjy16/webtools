@@ -4,17 +4,12 @@ import {
   Button,
   Card,
   CardContent,
-  FormControl,
   Grid,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
   Snackbar,
   Alert,
   TextField,
   Typography,
-  Stack,
   ToggleButtonGroup,
   ToggleButton
 } from '@mui/material';
@@ -35,7 +30,6 @@ export default function Base64Converter() {
   const handleModeChange = (event, newMode) => {
     if (newMode !== null) {
       setMode(newMode);
-      // 清除输出，但保留输入
       setOutput('');
       setError('');
     }
@@ -43,25 +37,23 @@ export default function Base64Converter() {
 
   const processData = () => {
     if (!input.trim()) {
-      setError('请输入要处理的数据');
+      setError('Please enter data to process');
       setOutput('');
       return;
     }
 
     try {
       if (mode === 'encode') {
-        // 编码为Base64
         const encoded = btoa(unescape(encodeURIComponent(input)));
         setOutput(encoded);
         setError('');
       } else {
-        // 解码Base64
         const decoded = decodeURIComponent(escape(atob(input)));
         setOutput(decoded);
         setError('');
       }
     } catch (err) {
-      setError(`${mode === 'encode' ? 'Base64编码' : 'Base64解码'}错误: ${err.message}`);
+      setError(`${mode === 'encode' ? 'Encoding error' : 'Decoding error'}: ${err.message}`);
       setOutput('');
     }
   };
@@ -69,7 +61,7 @@ export default function Base64Converter() {
   const copyToClipboard = () => {
     if (output) {
       navigator.clipboard.writeText(output);
-      showSnackbar('已复制到剪贴板', 'success');
+      showSnackbar('Copied to clipboard', 'success');
     }
   };
 
@@ -92,20 +84,10 @@ export default function Base64Converter() {
     if (!file) return;
 
     const reader = new FileReader();
-    
-    if (mode === 'encode') {
-      // 读取文件内容作为文本
-      reader.onload = (e) => {
-        setInput(e.target.result);
-      };
-      reader.readAsText(file);
-    } else {
-      // 读取文件内容作为文本
-      reader.onload = (e) => {
-        setInput(e.target.result);
-      };
-      reader.readAsText(file);
-    }
+    reader.onload = (e) => {
+      setInput(e.target.result);
+    };
+    reader.readAsText(file);
   };
 
   const showSnackbar = (message, severity) => {
@@ -117,10 +99,10 @@ export default function Base64Converter() {
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', p: 2 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        Base64 编码/解码工具
+        Base64 Encoder/Decoder
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        在线进行Base64编码和解码，支持文本和文件处理。
+        Perform Base64 encoding and decoding online. Supports text and file processing.
       </Typography>
 
       <Box sx={{ mb: 3 }}>
@@ -128,14 +110,14 @@ export default function Base64Converter() {
           value={mode}
           exclusive
           onChange={handleModeChange}
-          aria-label="编码或解码模式"
+          aria-label="Encode or Decode Mode"
           color="primary"
         >
-          <ToggleButton value="encode" aria-label="编码">
-            编码
+          <ToggleButton value="encode" aria-label="Encode">
+            Encode
           </ToggleButton>
-          <ToggleButton value="decode" aria-label="解码">
-            解码
+          <ToggleButton value="decode" aria-label="Decode">
+            Decode
           </ToggleButton>
         </ToggleButtonGroup>
       </Box>
@@ -146,14 +128,14 @@ export default function Base64Converter() {
             <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography variant="h6">
-                  {mode === 'encode' ? '输入文本' : '输入Base64'}
+                  {mode === 'encode' ? 'Input Text' : 'Input Base64'}
                 </Typography>
                 <Button
                   component="label"
                   size="small"
                   startIcon={<UploadFileIcon />}
                 >
-                  上传文件
+                  Upload File
                   <input
                     type="file"
                     hidden
@@ -167,7 +149,7 @@ export default function Base64Converter() {
                 rows={12}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={mode === 'encode' ? '输入要编码的文本...' : '输入要解码的Base64...'}
+                placeholder={mode === 'encode' ? 'Enter text to encode...' : 'Enter Base64 to decode...'}
                 error={!!error}
                 helperText={error}
                 sx={{ mb: 2, flexGrow: 1 }}
@@ -179,14 +161,14 @@ export default function Base64Converter() {
                   onClick={clearAll}
                   startIcon={<DeleteIcon />}
                 >
-                  清除
+                  Clear
                 </Button>
                 <Button
                   variant="contained"
                   color="primary"
                   onClick={processData}
                 >
-                  {mode === 'encode' ? '编码' : '解码'}
+                  {mode === 'encode' ? 'Encode' : 'Decode'}
                 </Button>
               </Box>
             </CardContent>
@@ -198,7 +180,7 @@ export default function Base64Converter() {
             <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography variant="h6">
-                  {mode === 'encode' ? 'Base64结果' : '解码结果'}
+                  {mode === 'encode' ? 'Base64 Result' : 'Decoded Result'}
                 </Typography>
                 <Box>
                   <IconButton onClick={swapInputOutput} disabled={!output} sx={{ mr: 1 }}>
@@ -215,7 +197,7 @@ export default function Base64Converter() {
                 rows={12}
                 value={output}
                 InputProps={{ readOnly: true }}
-                placeholder={mode === 'encode' ? 'Base64编码结果将显示在这里...' : '解码结果将显示在这里...'}
+                placeholder={mode === 'encode' ? 'Base64 encoded result will appear here...' : 'Decoded result will appear here...'}
                 sx={{ 
                   mb: 2, 
                   flexGrow: 1,
@@ -231,7 +213,7 @@ export default function Base64Converter() {
                 disabled={!output}
                 fullWidth
               >
-                复制结果
+                Copy Result
               </Button>
             </CardContent>
           </Card>

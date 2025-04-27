@@ -21,22 +21,21 @@ import {
 } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AdBanner from '../../components/AdBanner';
+import AdBanner from '../../components/AdBanner'; // Assuming this component exists
 import { js as beautifyJs, css as beautifyCss, html as beautifyHtml } from 'js-beautify';
 import CleanCSS from 'clean-css';
-// 移除 html-minifier 导入
-// import { minify as minifyHtml } from 'html-minifier';
-// 导入自定义的 HTML 压缩函数
-import { minifyHtml } from '../../utils/simple-html-minifier.js';
+// Import custom simple HTML minifier function
+import { minifyHtml } from '../../utils/simple-html-minifier.js'; // Assuming this util exists
 import { minify as minifyJs } from 'terser';
 
 export default function CodeFormatter() {
   const [activeTab, setActiveTab] = useState(0);
   const [inputCode, setInputCode] = useState('');
   const [outputCode, setOutputCode] = useState('');
-  const [formatType, setFormatType] = useState('js');
-  const [operation, setOperation] = useState('beautify');
+  const [formatType, setFormatType] = useState('js'); // Default to JavaScript
+  const [operation, setOperation] = useState('beautify'); // Default to beautify
   const [options, setOptions] = useState({
+    // js-beautify options
     js: {
       indent_size: 2,
       indent_char: ' ',
@@ -61,7 +60,7 @@ export default function CodeFormatter() {
       indent_char: ' ',
       max_preserve_newlines: 2,
       preserve_newlines: true,
-      indent_inner_html: false,
+      indent_inner_html: false, // Relevant for HTML beautify, but kept for consistency
       end_with_newline: false,
       wrap_line_length: 0,
       indent_empty_lines: false
@@ -79,51 +78,43 @@ export default function CodeFormatter() {
       content_unformatted: ['pre', 'code'],
       extra_liners: ['head', 'body', '/html']
     },
-    minifyHtml: {
-      removeComments: true,
-      removeCommentsFromCDATA: true,
-      removeCDATASectionsFromCDATA: true,
-      collapseWhitespace: true,
-      conservativeCollapse: false,
-      removeAttributeQuotes: false,
-      useShortDoctype: true,
-      keepClosingSlash: true,
-      minifyJS: true,
-      minifyCSS: true,
-      removeScriptTypeAttributes: true,
-      removeStyleLinkTypeAttributes: true
-    },
+    // Minification options (simplified for browser environment)
     minifyJs: {
       compress: {
         dead_code: true,
-        drop_console: false,
+        drop_console: false, // Usually configurable by user, default false
         drop_debugger: true,
         keep_classnames: false,
-        keep_fargs: true,
+        keep_fargs: true, // Often needed to avoid breaking code relying on Function.length
         keep_fnames: false,
-        keep_infinity: false
+        keep_infinity: false,
       },
-      mangle: true,
+      mangle: true, // Enable name mangling
       output: {
-        comments: false
+        comments: false // Remove comments
       }
     },
     minifyCss: {
-      level: 2
-    }
+      level: 1 // Use level 1 for broader compatibility and fewer potential issues in browser
+      // level: 2 // Level 2 is more aggressive
+    },
+    // Simple HTML minifier doesn't use options in this example
+    minifyHtml: {}
   });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success', 'error', 'warning', 'info'
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
+    // Automatically switch operation type based on tab
     setOperation(newValue === 0 ? 'beautify' : 'minify');
+    setOutputCode(''); // Clear output when switching tabs/operations
   };
 
   const handleFormatTypeChange = (event) => {
     setFormatType(event.target.value);
-    setOutputCode('');
+    setOutputCode(''); // Clear output when changing format type
   };
 
   const handleInputChange = (event) => {
@@ -136,116 +127,126 @@ export default function CodeFormatter() {
   };
 
   const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-    showSnackbar('已复制到剪贴板', 'success');
+    if (navigator.clipboard && text) {
+      navigator.clipboard.writeText(text)
+        .then(() => {
+          showSnackbar('Copied to clipboard', 'success');
+        })
+        .catch(err => {
+          console.error('Failed to copy: ', err);
+          showSnackbar('Failed to copy to clipboard', 'error');
+        });
+    } else {
+       showSnackbar('Clipboard not available or nothing to copy', 'warning');
+    }
   };
 
-  // 将 insertExample 函数移到组件内部
   const insertExample = () => {
     let example = '';
-    
     if (formatType === 'js') {
-      example = `function greeting(name) {\n  console.log("Hello, " + name + "!");\n  return { message: "Hello, " + name + "!" };\n}\n\ngreeting("World");`;
+      example = `function greeting(name) {\n  console.log("Hello, " + name + "!");\n  var obj = { message: \`Hello, \${name}!\`, id:123 }; return obj;\n}\n\ngreeting("World"); var x=1; if(x>0){ console.log('positive'); } else { console.log('non-positive'); }`;
     } else if (formatType === 'css') {
-      example = `body{margin:0;padding:0;font-family:Arial,sans-serif;}.container{width:100%;max-width:1200px;margin:0 auto;padding:20px;}.header{background-color:#f0f0f0;padding:10px;border-bottom:1px solid #ddd;}`;
+      example = `body{margin:0;padding:0;font-family:Arial,sans-serif; background: #eee;} /* comment */ .container{width:100%;max-width:1200px;margin:0 auto;padding:20px;} .header { background-color: #f0f0f0; padding: 10px; border-bottom: 1px solid #ddd; }`;
     } else if (formatType === 'html') {
-      example = `<!DOCTYPE html><html><head><title>Example</title><style>body{margin:0;padding:0;}</style></head><body><div class="container"><h1>Hello World</h1><p>This is an example.</p></div><script>console.log("Hello!");</script></body></html>`;
+      example = `<!DOCTYPE html><html> <head> <title>Example Page</title> <style>body{margin:0;padding:0;} .c { color: red; } </style><!-- comment --> </head> <body> <div class="container"> <h1>Hello World</h1> <p>This is an example paragraph.</p> </div> <script> function hello(){ console.log("Hello from script!"); } hello(); </script> </body></html>`;
     }
-    
     setInputCode(example);
+    setOutputCode(''); // Clear previous output
   };
 
-  // 修复 handleProcess 函数中的 JS 压缩部分
-  // 修改 handleProcess 函数，确保 if-else 结构正确
   const handleProcess = async () => {
     if (!inputCode.trim()) {
-      showSnackbar('请输入代码', 'error');
+      showSnackbar('Please enter code', 'error');
       return;
     }
-  
+
+    setOutputCode(''); // Clear previous output before processing
+
     try {
       if (operation === 'beautify') {
-        // 美化代码
+        // Beautify Code
         let beautified = '';
-        
         if (formatType === 'js') {
-          try {
-            // 尝试解析 JS 以验证语法
-            // eslint-disable-next-line no-new-func
-            new Function(inputCode);
-            beautified = beautifyJs(inputCode, options.js);
-          } catch (jsError) {
-            console.error('JavaScript 语法错误:', jsError);
-            // 即使有语法错误也尝试美化
-            beautified = beautifyJs(inputCode, options.js);
-          }
+           try {
+            // Basic syntax check attempt (not foolproof)
+             // eslint-disable-next-line no-new-func
+             new Function(inputCode);
+             beautified = beautifyJs(inputCode, options.js);
+           } catch (jsError) {
+             console.warn('Potential JavaScript syntax error, attempting beautification anyway:', jsError);
+             // Attempt beautification even with syntax errors, as js-beautify might still work partially
+             beautified = beautifyJs(inputCode, options.js);
+           }
         } else if (formatType === 'css') {
           beautified = beautifyCss(inputCode, options.css);
         } else if (formatType === 'html') {
           beautified = beautifyHtml(inputCode, options.html);
         }
-        
         setOutputCode(beautified);
-        showSnackbar('代码美化成功', 'success');
+        showSnackbar('Code beautified successfully', 'success');
+
       } else {
-        // 压缩代码
+        // Minify Code
         if (formatType === 'js') {
           try {
-            // 确保 terser 选项正确，避免使用可能依赖 process 的选项
-            const minifyOptions = {
-              compress: {
-                dead_code: true,
-                drop_debugger: true,
-                keep_fargs: true
-              },
-              mangle: true,
-              output: {
-                comments: false
-              }
-            };
-            
+            // Ensure Terser options are safe for browser env
+            const minifyOptions = { ...options.minifyJs };
+             // Remove options potentially causing issues if process is not defined
+            if (minifyOptions.compress && minifyOptions.compress.global_defs) {
+                delete minifyOptions.compress.global_defs;
+            }
+
             const result = await minifyJs(inputCode, minifyOptions);
-            if (result && result.code) {
+            if (result && typeof result.code === 'string') {
               setOutputCode(result.code);
-              showSnackbar('代码压缩成功', 'success');
+              showSnackbar('Code minified successfully', 'success');
             } else {
-              throw new Error('JavaScript 压缩失败');
+               // Handle cases where Terser might return an error object instead
+               if (result && result.error) {
+                   throw result.error;
+               }
+              throw new Error('JavaScript minification failed to produce code.');
             }
           } catch (jsError) {
-            console.error('JavaScript 压缩错误:', jsError);
-            showSnackbar(`JavaScript 压缩失败: ${jsError.message}`, 'error');
+            console.error('JavaScript Minification Error:', jsError);
+            showSnackbar(`JavaScript minification failed: ${jsError.message}`, 'error');
           }
         } else if (formatType === 'css') {
           try {
-            // 使用更简单的 CleanCSS 配置
-            const minifier = new CleanCSS({ level: 1 });
+            const minifier = new CleanCSS(options.minifyCss);
             const result = minifier.minify(inputCode);
-            
-            if (result && result.styles !== undefined) {
-              setOutputCode(result.styles);
-              showSnackbar('代码压缩成功', 'success');
-            } else {
-              throw new Error('CSS 压缩失败');
-            }
+             if (result.errors && result.errors.length > 0) {
+                console.error('CleanCSS Errors:', result.errors);
+                showSnackbar(`CSS minification failed: ${result.errors.join(', ')}`, 'error');
+             } else if (result.warnings && result.warnings.length > 0) {
+                console.warn('CleanCSS Warnings:', result.warnings);
+                setOutputCode(result.styles);
+                showSnackbar('CSS minified with warnings.', 'warning');
+             } else if (result.styles !== undefined) {
+               setOutputCode(result.styles);
+               showSnackbar('Code minified successfully', 'success');
+             } else {
+               throw new Error('CSS minification failed to produce styles.');
+             }
           } catch (cssError) {
-            console.error('CSS 压缩错误:', cssError);
-            showSnackbar(`CSS 压缩失败: ${cssError.message}`, 'error');
+            console.error('CSS Minification Error:', cssError);
+            showSnackbar(`CSS minification failed: ${cssError.message}`, 'error');
           }
         } else if (formatType === 'html') {
           try {
-            // 使用自定义的简单 HTML 压缩函数，不需要传递选项
-            const result = minifyHtml(inputCode);
+            // Using the simple custom HTML minifier
+            const result = minifyHtml(inputCode); // No options needed for this simple version
             setOutputCode(result);
-            showSnackbar('代码压缩成功', 'success');
+            showSnackbar('Code minified successfully', 'success');
           } catch (htmlError) {
-            console.error('HTML 压缩错误:', htmlError);
-            showSnackbar(`HTML 压缩失败: ${htmlError.message}`, 'error');
+            console.error('HTML Minification Error:', htmlError);
+            showSnackbar(`HTML minification failed: ${htmlError.message}`, 'error');
           }
         }
       }
     } catch (error) {
-      console.error('处理代码时出错:', error);
-      showSnackbar(`处理失败: ${error.message}`, 'error');
+      console.error('Error processing code:', error);
+      showSnackbar(`Processing failed: ${error.message}`, 'error');
     }
   };
 
@@ -256,35 +257,39 @@ export default function CodeFormatter() {
   };
 
   return (
-    <Box sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        代码格式化工具
+    <Box sx={{ maxWidth: 900, mx: 'auto', p: { xs: 1, sm: 2 } }}> {/* Responsive padding */}
+      <Typography variant="h4" component="h1" gutterBottom align="center">
+        Code Formatter Tool
       </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        美化或压缩您的JavaScript、CSS和HTML代码。
+      <Typography variant="body1" color="text.secondary" paragraph align="center" sx={{ mb: 3 }}>
+        Beautify or minify your JavaScript, CSS, and HTML code.
       </Typography>
 
-      {/* 工具上方广告 */}
-      <AdBanner slot="8899001122" />
+      {/* Ad banner above the tool */}
+      {/* <AdBanner slot="YOUR_AD_SLOT_ID_1" /> */}
 
       <Card sx={{ mb: 4, boxShadow: 3 }}>
         <CardContent>
-          <Tabs 
-            value={activeTab} 
-            onChange={handleTabChange} 
-            sx={{ mb: 3 }}
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            indicatorColor="primary"
+            textColor="primary"
+            variant="fullWidth" // Makes tabs take full width
+            sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}
           >
-            <Tab label="代码美化" />
-            <Tab label="代码压缩" />
+            <Tab label="Beautify Code" />
+            <Tab label="Minify Code" />
           </Tabs>
 
-          <Grid container spacing={3}>
+          <Grid container spacing={2}> {/* Reduced spacing */}
             <Grid item xs={12}>
-              <FormControl fullWidth sx={{ mb: 3 }}>
-                <InputLabel>代码类型</InputLabel>
+              <FormControl fullWidth sx={{ mb: 2 }}> {/* Reduced margin */}
+                <InputLabel id="format-type-label">Code Type</InputLabel>
                 <Select
+                  labelId="format-type-label"
                   value={formatType}
-                  label="代码类型"
+                  label="Code Type"
                   onChange={handleFormatTypeChange}
                 >
                   <MenuItem value="js">JavaScript</MenuItem>
@@ -293,83 +298,92 @@ export default function CodeFormatter() {
                 </Select>
               </FormControl>
             </Grid>
-            
+
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="输入代码"
+                label="Input Code"
                 multiline
-                rows={8}
+                rows={10} // Increased rows for better usability
                 value={inputCode}
                 onChange={handleInputChange}
-                placeholder={`请在此输入您的${formatType.toUpperCase()}代码...`}
-                sx={{ fontFamily: 'monospace' }}
+                placeholder={`Please enter your ${formatType.toUpperCase()} code here...`}
+                variant="outlined" // Standard outlined variant
+                InputProps={{ sx: { fontFamily: 'monospace', fontSize: '0.9rem' } }} // Monospace font
               />
             </Grid>
-            
-            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-              <Button 
-                variant="contained" 
-                color="primary" 
+
+            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1, mb: 2 }}> {/* Flex wrap and gap */}
+              <Button
+                variant="contained"
+                color="primary"
                 onClick={handleProcess}
-                disabled={!inputCode.trim()}
+                disabled={!inputCode.trim()} // Disable if input is empty
+                size="large" // Larger main button
               >
-                {operation === 'beautify' ? '美化代码' : '压缩代码'}
+                {operation === 'beautify' ? 'Beautify Code' : 'Minify Code'}
               </Button>
-              
-              <Box>
-                <Button 
+
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}> {/* Gap between buttons */}
+                <Button
                   variant="outlined"
                   color="info"
                   onClick={insertExample}
-                  sx={{ mr: 1 }}
                 >
-                  插入示例
+                  Insert Example
                 </Button>
-                
-                <Button 
-                  variant="outlined" 
-                  color="secondary" 
+
+                <Button
+                  variant="outlined"
+                  color="secondary"
                   onClick={clearAll}
                   startIcon={<DeleteIcon />}
                 >
-                  清空
+                  Clear All
                 </Button>
               </Box>
             </Grid>
-            
+
             {outputCode && (
               <Grid item xs={12}>
-                <Paper 
-                  elevation={3} 
-                  sx={{ 
-                    p: 2, 
+                <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>Output:</Typography>
+                <Paper
+                  elevation={1} // Subtle elevation
+                  sx={{
+                    p: 1.5, // Padding
                     position: 'relative',
-                    backgroundColor: '#f5f5f5',
-                    fontFamily: 'monospace',
-                    maxHeight: '400px',
-                    overflow: 'auto'
+                    backgroundColor: 'grey.100', // Light background for contrast
+                    maxHeight: '500px', // Increased max height
+                    overflow: 'auto',
+                    border: '1px solid', // Add a border
+                    borderColor: 'divider',
                   }}
                 >
-                  <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
-                    <IconButton 
-                      onClick={() => copyToClipboard(outputCode)}
-                      color="primary"
-                      size="small"
-                      sx={{ backgroundColor: 'white' }}
-                    >
-                      <ContentCopyIcon />
-                    </IconButton>
-                  </Box>
-                  
-                  <Typography 
-                    component="pre" 
-                    sx={{ 
-                      whiteSpace: 'pre-wrap', 
-                      wordBreak: 'break-all',
-                      mt: 1,
+                  <IconButton
+                    onClick={() => copyToClipboard(outputCode)}
+                    color="primary"
+                    size="small"
+                    sx={{
+                      position: 'absolute',
+                      top: 8,
+                      right: 8,
+                      backgroundColor: 'white', // Background for visibility
+                      '&:hover': { backgroundColor: 'grey.200' }
+                    }}
+                    title="Copy output code" // Tooltip
+                  >
+                    <ContentCopyIcon fontSize="small" />
+                  </IconButton>
+
+                  <Typography
+                    component="pre"
+                    sx={{
+                      whiteSpace: 'pre-wrap', // Wrap long lines
+                      wordBreak: 'break-all', // Break words if necessary
+                      mt: 0, // No top margin needed now
                       fontFamily: 'monospace',
-                      fontSize: '0.875rem'
+                      fontSize: '0.9rem',
+                      lineHeight: 1.5 // Improved line spacing
                     }}
                   >
                     {outputCode}
@@ -381,17 +395,19 @@ export default function CodeFormatter() {
         </CardContent>
       </Card>
 
-      {/* 工具下方广告 */}
-      <AdBanner slot="8899001122" />
+      {/* Ad banner below the tool */}
+      {/* <AdBanner slot="YOUR_AD_SLOT_ID_2" /> */}
 
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={3000}
+        autoHideDuration={4000} // Slightly longer duration
         onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} // Center snackbar
       >
-        <Alert 
-          onClose={() => setSnackbarOpen(false)} 
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
           severity={snackbarSeverity}
+          variant="filled" // Filled variant for better visibility
           sx={{ width: '100%' }}
         >
           {snackbarMessage}

@@ -17,7 +17,8 @@ import {
 } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
+// Removed UploadFileIcon as it's not used in the translated version's logic below
+// import UploadFileIcon from '@mui/icons-material/UploadFile';
 
 export default function HmacCalculator() {
   const [message, setMessage] = useState('');
@@ -31,24 +32,24 @@ export default function HmacCalculator() {
 
   const calculateHmac = async () => {
     if (!message.trim()) {
-      setError('请输入消息内容');
+      setError('Please enter the message content');
       setOutput('');
       return;
     }
 
     if (!key.trim()) {
-      setError('请输入密钥');
+      setError('Please enter the key');
       setOutput('');
       return;
     }
 
     try {
-      // 使用Web Crypto API计算HMAC
+      // Calculate HMAC using Web Crypto API
       const encoder = new TextEncoder();
       const keyData = encoder.encode(key);
       const messageData = encoder.encode(message);
-      
-      // 导入密钥
+
+      // Import the key
       const cryptoKey = await crypto.subtle.importKey(
         'raw',
         keyData,
@@ -59,22 +60,22 @@ export default function HmacCalculator() {
         false,
         ['sign']
       );
-      
-      // 计算HMAC
+
+      // Calculate the HMAC
       const signature = await crypto.subtle.sign(
         'HMAC',
         cryptoKey,
         messageData
       );
-      
-      // 将ArrayBuffer转换为十六进制字符串
+
+      // Convert ArrayBuffer to hexadecimal string
       const hashArray = Array.from(new Uint8Array(signature));
       const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-      
+
       setOutput(hashHex);
       setError('');
     } catch (err) {
-      setError(`HMAC计算错误: ${err.message}`);
+      setError(`HMAC calculation error: ${err.message}`);
       setOutput('');
     }
   };
@@ -82,7 +83,7 @@ export default function HmacCalculator() {
   const copyToClipboard = () => {
     if (output) {
       navigator.clipboard.writeText(output);
-      showSnackbar('HMAC值已复制到剪贴板', 'success');
+      showSnackbar('HMAC value copied to clipboard', 'success');
     }
   };
 
@@ -102,10 +103,10 @@ export default function HmacCalculator() {
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', p: 2 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        HMAC 计算器
+        HMAC Calculator
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        使用不同的哈希算法计算消息认证码(HMAC)，用于验证消息的完整性和真实性。
+        Calculate the Hash-based Message Authentication Code (HMAC) using different hash algorithms to verify message integrity and authenticity.
       </Typography>
 
       <Grid container spacing={3}>
@@ -113,37 +114,37 @@ export default function HmacCalculator() {
           <Card sx={{ height: '100%' }}>
             <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Typography variant="h6" gutterBottom>
-                输入
+                Input
               </Typography>
-              
+
               <TextField
-                label="消息"
+                label="Message"
                 multiline
                 fullWidth
                 rows={4}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="输入要计算HMAC的消息..."
+                placeholder="Enter the message to calculate HMAC..."
                 margin="normal"
                 error={!!error && !message.trim()}
               />
-              
+
               <TextField
-                label="密钥"
+                label="Key"
                 fullWidth
                 value={key}
                 onChange={(e) => setKey(e.target.value)}
-                placeholder="输入密钥..."
+                placeholder="Enter the key..."
                 margin="normal"
                 error={!!error && !key.trim()}
               />
-              
+
               <FormControl fullWidth margin="normal">
-                <InputLabel>哈希算法</InputLabel>
+                <InputLabel>Hash Algorithm</InputLabel>
                 <Select
                   value={algorithm}
                   onChange={(e) => setAlgorithm(e.target.value)}
-                  label="哈希算法"
+                  label="Hash Algorithm"
                 >
                   <MenuItem value="SHA-1">SHA-1</MenuItem>
                   <MenuItem value="SHA-256">SHA-256</MenuItem>
@@ -151,45 +152,46 @@ export default function HmacCalculator() {
                   <MenuItem value="SHA-512">SHA-512</MenuItem>
                 </Select>
               </FormControl>
-              
+
               {error && (
                 <Typography color="error" sx={{ mt: 2 }}>
                   {error}
                 </Typography>
               )}
-              
+
               <Box sx={{ mt: 'auto', pt: 2, display: 'flex', gap: 1 }}>
-                <Button 
-                  variant="contained" 
+                <Button
+                  variant="contained"
                   onClick={calculateHmac}
                   fullWidth
                 >
-                  计算 HMAC
+                  Calculate HMAC
                 </Button>
-                <Button 
-                  variant="outlined" 
+                <Button
+                  variant="outlined"
                   onClick={clearAll}
                   color="secondary"
+                  startIcon={<DeleteIcon />}
                 >
-                  清除
+                  Clear
                 </Button>
               </Box>
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} md={6}>
           <Card sx={{ height: '100%' }}>
             <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="h6">HMAC 结果</Typography>
+                <Typography variant="h6">HMAC Result</Typography>
                 {output && (
                   <IconButton onClick={copyToClipboard} size="small">
                     <ContentCopyIcon />
                   </IconButton>
                 )}
               </Box>
-              
+
               <TextField
                 multiline
                 fullWidth
@@ -198,12 +200,12 @@ export default function HmacCalculator() {
                 InputProps={{
                   readOnly: true,
                 }}
-                placeholder="HMAC结果将显示在这里..."
-                sx={{ fontFamily: 'monospace' }}
+                placeholder="HMAC result will be displayed here..."
+                sx={{ fontFamily: 'monospace', '& .MuiInputBase-input': { fontFamily: 'monospace' } }}
               />
-              
+
               <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                使用 {algorithm} 算法计算的HMAC值
+                HMAC value calculated using {algorithm} algorithm
               </Typography>
             </CardContent>
           </Card>
@@ -215,9 +217,10 @@ export default function HmacCalculator() {
         autoHideDuration={6000}
         onClose={() => setSnackbarOpen(false)}
       >
-        <Alert 
-          onClose={() => setSnackbarOpen(false)} 
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
           severity={snackbarSeverity}
+          sx={{ width: '100%' }}
         >
           {snackbarMessage}
         </Alert>

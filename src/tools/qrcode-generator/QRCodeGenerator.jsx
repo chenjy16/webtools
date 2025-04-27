@@ -33,7 +33,7 @@ export default function QRCodeGenerator() {
 
   const generateQRCode = async () => {
     if (!text.trim()) {
-      setError('请输入要转换为二维码的文本');
+      setError('Please enter text to convert to QR code');
       setQrCodeUrl('');
       return;
     }
@@ -47,7 +47,7 @@ export default function QRCodeGenerator() {
       setQrCodeUrl(url);
       setError('');
     } catch (err) {
-      setError(`生成二维码错误: ${err.message}`);
+      setError(`QR code generation error: ${err.message}`);
       setQrCodeUrl('');
     }
   };
@@ -60,14 +60,14 @@ export default function QRCodeGenerator() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showSnackbar('二维码已下载', 'success');
+      showSnackbar('QR code downloaded', 'success');
     }
   };
 
   const copyQRCodeUrl = () => {
     if (qrCodeUrl) {
       navigator.clipboard.writeText(qrCodeUrl);
-      showSnackbar('二维码URL已复制到剪贴板', 'success');
+      showSnackbar('QR code URL copied to clipboard', 'success');
     }
   };
 
@@ -86,10 +86,10 @@ export default function QRCodeGenerator() {
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', p: 2 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        二维码生成器
+        QR Code Generator
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        生成自定义二维码，可用于网址、联系方式、Wi-Fi连接等信息分享。
+        Generate custom QR codes for sharing URLs, contact information, Wi-Fi connections, and more.
       </Typography>
 
       <Grid container spacing={3}>
@@ -97,7 +97,7 @@ export default function QRCodeGenerator() {
           <Card sx={{ height: '100%' }}>
             <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Typography variant="h6" gutterBottom>
-                输入内容
+                Input Content
               </Typography>
               <TextField
                 multiline
@@ -105,39 +105,39 @@ export default function QRCodeGenerator() {
                 rows={6}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="输入文本、URL或其他信息..."
+                placeholder="Enter text, URL, or other information..."
                 error={!!error}
                 helperText={error}
                 sx={{ mb: 2, flexGrow: 1 }}
               />
-              
+
               <Stack spacing={2}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography>纠错级别:</Typography>
+                  <Typography>Error Correction Level:</Typography>
                   <FormControl sx={{ minWidth: 120 }}>
-                    <InputLabel id="error-correction-level-label">纠错级别</InputLabel>
+                    <InputLabel id="error-correction-level-label">Error Correction</InputLabel>
                     <Select
                       labelId="error-correction-level-label"
                       value={errorCorrectionLevel}
-                      label="纠错级别"
+                      label="Error Correction"
                       onChange={(e) => setErrorCorrectionLevel(e.target.value)}
                     >
-                      <MenuItem value="L">低 (7%)</MenuItem>
-                      <MenuItem value="M">中 (15%)</MenuItem>
-                      <MenuItem value="Q">高 (25%)</MenuItem>
-                      <MenuItem value="H">最高 (30%)</MenuItem>
+                      <MenuItem value="L">Low (7%)</MenuItem>
+                      <MenuItem value="M">Medium (15%)</MenuItem>
+                      <MenuItem value="Q">Quartile (25%)</MenuItem>
+                      <MenuItem value="H">High (30%)</MenuItem>
                     </Select>
                   </FormControl>
                 </Box>
-                
+
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography>尺寸 (像素):</Typography>
+                  <Typography>Size (pixels):</Typography>
                   <FormControl sx={{ minWidth: 120 }}>
-                    <InputLabel id="size-label">尺寸</InputLabel>
+                    <InputLabel id="size-label">Size</InputLabel>
                     <Select
                       labelId="size-label"
                       value={size}
-                      label="尺寸"
+                      label="Size"
                       onChange={(e) => setSize(e.target.value)}
                     >
                       <MenuItem value={128}>128 x 128</MenuItem>
@@ -149,7 +149,7 @@ export default function QRCodeGenerator() {
                   </FormControl>
                 </Box>
               </Stack>
-              
+
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
                 <Button
                   variant="outlined"
@@ -157,14 +157,14 @@ export default function QRCodeGenerator() {
                   onClick={clearAll}
                   startIcon={<DeleteIcon />}
                 >
-                  清除
+                  Clear
                 </Button>
                 <Button
                   variant="contained"
                   color="primary"
                   onClick={generateQRCode}
                 >
-                  生成二维码
+                  Generate QR Code
                 </Button>
               </Box>
             </CardContent>
@@ -175,7 +175,7 @@ export default function QRCodeGenerator() {
           <Card sx={{ height: '100%' }}>
             <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mb: 2 }}>
-                <Typography variant="h6">二维码预览</Typography>
+                <Typography variant="h6">QR Code Preview</Typography>
                 <Box>
                   <IconButton onClick={copyQRCodeUrl} disabled={!qrCodeUrl} sx={{ mr: 1 }}>
                     <ContentCopyIcon />
@@ -185,12 +185,12 @@ export default function QRCodeGenerator() {
                   </IconButton>
                 </Box>
               </Box>
-              
-              <Box 
-                sx={{ 
-                  flexGrow: 1, 
-                  display: 'flex', 
-                  justifyContent: 'center', 
+
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  display: 'flex',
+                  justifyContent: 'center',
                   alignItems: 'center',
                   width: '100%',
                   minHeight: 250,
@@ -200,18 +200,18 @@ export default function QRCodeGenerator() {
                 }}
               >
                 {qrCodeUrl ? (
-                  <img 
-                    src={qrCodeUrl} 
-                    alt="生成的二维码" 
-                    style={{ maxWidth: '100%', maxHeight: '100%' }} 
+                  <img
+                    src={qrCodeUrl}
+                    alt="Generated QR Code"
+                    style={{ maxWidth: '100%', maxHeight: '100%' }}
                   />
                 ) : (
                   <Typography color="text.secondary">
-                    二维码将显示在这里...
+                    QR code will be displayed here...
                   </Typography>
                 )}
               </Box>
-              
+
               {qrCodeUrl && (
                 <Button
                   variant="contained"
@@ -220,7 +220,7 @@ export default function QRCodeGenerator() {
                   startIcon={<DownloadIcon />}
                   sx={{ mt: 2 }}
                 >
-                  下载二维码
+                  Download QR Code
                 </Button>
               )}
             </CardContent>

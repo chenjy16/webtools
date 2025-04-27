@@ -26,6 +26,7 @@ const RegexTester = lazy(() => import('./tools/regex-tester/RegexTester'));
 const Timer = lazy(() => import('./tools/timer/Timer'));
 const CodeFormatter = lazy(() => import('./tools/code-formatter/CodeFormatter'));
 const UnitConverter = lazy(() => import('./tools/unit-converter/UnitConverter'));
+const About = lazy(() => import('./pages/About')); // 添加这一行，懒加载 About 组件
 
 // 加载指示器
 const LoadingFallback = () => (
@@ -62,6 +63,7 @@ function App() {
             <Route path="timer" element={<Timer />} />
             <Route path="code-formatter" element={<CodeFormatter />} />
             <Route path="unit-converter" element={<UnitConverter />} />
+            <Route path="about" element={<About />} />
           </Route>
         </Routes>
       </Suspense>

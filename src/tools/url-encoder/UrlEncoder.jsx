@@ -17,6 +17,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
+import AdBanner from '../../components/AdBanner'; // Assuming AdBanner component exists
 
 export default function UrlEncoder() {
   const [input, setInput] = useState('');
@@ -30,7 +31,7 @@ export default function UrlEncoder() {
   const handleModeChange = (event, newMode) => {
     if (newMode !== null) {
       setMode(newMode);
-      // 清除输出，但保留输入
+      // Clear output, but keep input
       setOutput('');
       setError('');
     }
@@ -38,25 +39,25 @@ export default function UrlEncoder() {
 
   const processData = () => {
     if (!input.trim()) {
-      setError('请输入要处理的数据');
+      setError('Please enter the data to process');
       setOutput('');
       return;
     }
 
     try {
       if (mode === 'encode') {
-        // URL编码
+        // URL encode
         const encoded = encodeURIComponent(input);
         setOutput(encoded);
         setError('');
       } else {
-        // URL解码
+        // URL decode
         const decoded = decodeURIComponent(input);
         setOutput(decoded);
         setError('');
       }
     } catch (err) {
-      setError(`${mode === 'encode' ? 'URL编码' : 'URL解码'}错误: ${err.message}`);
+      setError(`${mode === 'encode' ? 'URL Encoding' : 'URL Decoding'} error: ${err.message}`);
       setOutput('');
     }
   };
@@ -64,7 +65,7 @@ export default function UrlEncoder() {
   const copyToClipboard = () => {
     if (output) {
       navigator.clipboard.writeText(output);
-      showSnackbar('已复制到剪贴板', 'success');
+      showSnackbar('Copied to clipboard', 'success');
     }
   };
 
@@ -102,25 +103,28 @@ export default function UrlEncoder() {
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', p: 2 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        URL 编码/解码工具
+        URL Encoder/Decoder Tool
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        在线进行URL编码和解码，支持特殊字符和Unicode字符处理。
+        Online URL encoding and decoding, supports special characters and Unicode characters.
       </Typography>
+
+      {/* Ad above the tool */}
+      <AdBanner slot="8899001122" />
 
       <Box sx={{ mb: 3 }}>
         <ToggleButtonGroup
           value={mode}
           exclusive
           onChange={handleModeChange}
-          aria-label="编码或解码模式"
+          aria-label="Encode or Decode mode"
           color="primary"
         >
-          <ToggleButton value="encode" aria-label="编码">
-            编码
+          <ToggleButton value="encode" aria-label="Encode">
+            Encode
           </ToggleButton>
-          <ToggleButton value="decode" aria-label="解码">
-            解码
+          <ToggleButton value="decode" aria-label="Decode">
+            Decode
           </ToggleButton>
         </ToggleButtonGroup>
       </Box>
@@ -131,14 +135,14 @@ export default function UrlEncoder() {
             <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography variant="h6">
-                  {mode === 'encode' ? '输入文本' : '输入URL编码'}
+                  {mode === 'encode' ? 'Input Text' : 'Input URL Encoded String'}
                 </Typography>
                 <Button
                   component="label"
                   size="small"
                   startIcon={<UploadFileIcon />}
                 >
-                  上传文件
+                  Upload File
                   <input
                     type="file"
                     hidden
@@ -152,7 +156,7 @@ export default function UrlEncoder() {
                 rows={12}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={mode === 'encode' ? '输入要编码的文本...' : '输入要解码的URL编码...'}
+                placeholder={mode === 'encode' ? 'Enter text to encode...' : 'Enter URL encoded string to decode...'}
                 error={!!error}
                 helperText={error}
                 sx={{ mb: 2, flexGrow: 1 }}
@@ -164,14 +168,14 @@ export default function UrlEncoder() {
                   onClick={clearAll}
                   startIcon={<DeleteIcon />}
                 >
-                  清除
+                  Clear
                 </Button>
                 <Button
                   variant="contained"
                   color="primary"
                   onClick={processData}
                 >
-                  {mode === 'encode' ? '编码' : '解码'}
+                  {mode === 'encode' ? 'Encode' : 'Decode'}
                 </Button>
               </Box>
             </CardContent>
@@ -183,7 +187,7 @@ export default function UrlEncoder() {
             <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography variant="h6">
-                  {mode === 'encode' ? 'URL编码结果' : '解码结果'}
+                  {mode === 'encode' ? 'URL Encoded Result' : 'Decoded Result'}
                 </Typography>
                 <Box>
                   <IconButton onClick={swapInputOutput} disabled={!output} sx={{ mr: 1 }}>
@@ -200,9 +204,9 @@ export default function UrlEncoder() {
                 rows={12}
                 value={output}
                 InputProps={{ readOnly: true }}
-                placeholder={mode === 'encode' ? 'URL编码结果将显示在这里...' : '解码结果将显示在这里...'}
-                sx={{ 
-                  mb: 2, 
+                placeholder={mode === 'encode' ? 'URL encoded result will appear here...' : 'Decoded result will appear here...'}
+                sx={{
+                  mb: 2,
                   flexGrow: 1,
                   fontFamily: 'monospace',
                   '& .MuiInputBase-input': { fontFamily: 'monospace' }
@@ -216,12 +220,15 @@ export default function UrlEncoder() {
                 disabled={!output}
                 fullWidth
               >
-                复制结果
+                Copy Result
               </Button>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
+
+      {/* Ad below the tool */}
+      <AdBanner slot="8899001122" />
 
       <Snackbar
         open={snackbarOpen}

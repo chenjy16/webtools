@@ -1,12 +1,28 @@
-// 在其他导入之前导入 process polyfill
-import './utils/process-polyfill.js';
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { HelmetProvider } from 'react-helmet-async';
+import App from './App';
+import './index.css';
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+const rootElement = document.getElementById('root');
+
+// 支持 react-snap 预渲染
+if (rootElement.hasChildNodes()) {
+  ReactDOM.hydrateRoot(
+    rootElement,
+    <React.StrictMode>
+      <HelmetProvider>
+        <App />
+      </HelmetProvider>
+    </React.StrictMode>
+  );
+} else {
+  const root = ReactDOM.createRoot(rootElement);
+  root.render(
+    <React.StrictMode>
+      <HelmetProvider>
+        <App />
+      </HelmetProvider>
+    </React.StrictMode>
+  );
+}

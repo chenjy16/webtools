@@ -63,28 +63,28 @@ export default function DateCalculator() {
     const start = new Date(startDate);
     const end = new Date(endDate);
     
-    // 计算毫秒差值
+    // Calculate difference in milliseconds
     const diffMs = Math.abs(end - start);
     
-    // 计算天数差
+    // Calculate difference in days
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     
-    // 计算周数
+    // Calculate difference in weeks
     const diffWeeks = Math.floor(diffDays / 7);
     
-    // 计算月数（近似值）
+    // Calculate difference in months (approximate)
     const diffMonths = Math.floor(diffDays / 30.44);
     
-    // 计算年数（近似值）
+    // Calculate difference in years (approximate)
     const diffYears = Math.floor(diffDays / 365.25);
     
-    // 计算小时数
+    // Calculate difference in hours
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     
-    // 计算分钟数
+    // Calculate difference in minutes
     const diffMinutes = Math.floor(diffMs / (1000 * 60));
     
-    // 计算秒数
+    // Calculate difference in seconds
     const diffSeconds = Math.floor(diffMs / 1000);
 
     setDateResult({
@@ -134,7 +134,7 @@ export default function DateCalculator() {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    showSnackbar('已复制到剪贴板', 'success');
+    showSnackbar('Copied to clipboard', 'success');
   };
 
   const showSnackbar = (message, severity) => {
@@ -146,13 +146,13 @@ export default function DateCalculator() {
   return (
     <Box sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        日期计算器
+        Date Calculator
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        计算两个日期之间的差异，或者在日期上添加/减去时间。
+        Calculate the difference between two dates, or add/subtract time from a date.
       </Typography>
 
-      {/* 工具上方广告 */}
+      {/* Ad above the tool */}
       <AdBanner slot="9900112233" />
 
       <Card sx={{ mb: 4, boxShadow: 3 }}>
@@ -162,8 +162,8 @@ export default function DateCalculator() {
             onChange={handleTabChange} 
             sx={{ mb: 3 }}
           >
-            <Tab label="日期差异" />
-            <Tab label="日期加减" />
+            <Tab label="Date Difference" />
+            <Tab label="Date Addition/Subtraction" />
           </Tabs>
 
           {activeTab === 0 && (
@@ -172,7 +172,7 @@ export default function DateCalculator() {
                 {/* Replace MUI DatePicker with standard date input */}
                 <TextField
                   fullWidth
-                  label="开始日期"
+                  label="Start Date"
                   type="date"
                   value={formatDateForInput(startDate)}
                   onChange={(e) => setStartDate(new Date(e.target.value))}
@@ -184,7 +184,7 @@ export default function DateCalculator() {
                 {/* Replace MUI DatePicker with standard date input */}
                 <TextField
                   fullWidth
-                  label="结束日期"
+                  label="End Date"
                   type="date"
                   value={formatDateForInput(endDate)}
                   onChange={(e) => setEndDate(new Date(e.target.value))}
@@ -199,7 +199,7 @@ export default function DateCalculator() {
                   onClick={calculateDateDifference}
                   fullWidth
                 >
-                  计算日期差异
+                  Calculate Date Difference
                 </Button>
               </Grid>
               
@@ -207,9 +207,9 @@ export default function DateCalculator() {
                 <Grid item xs={12}>
                   <Paper elevation={3} sx={{ p: 3, mt: 2, borderRadius: 2, backgroundColor: '#fafafa' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                      <Typography variant="h6" color="primary">计算结果</Typography>
+                      <Typography variant="h6" color="primary">Calculation Result</Typography>
                       <IconButton 
-                        onClick={() => copyToClipboard(`${dateResult.days} 天, ${dateResult.hours} 小时, ${dateResult.minutes} 分钟`)}
+                        onClick={() => copyToClipboard(`${dateResult.days} days, ${dateResult.hours} hours, ${dateResult.minutes} minutes`)}
                         color="primary"
                       >
                         <ContentCopyIcon />
@@ -219,31 +219,31 @@ export default function DateCalculator() {
                     
                     <Grid container spacing={2}>
                       <Grid item xs={6} sm={4}>
-                        <Typography variant="body2" color="text.secondary">年:</Typography>
+                        <Typography variant="body2" color="text.secondary">Years:</Typography>
                         <Typography variant="h6">{dateResult.years}</Typography>
                       </Grid>
                       <Grid item xs={6} sm={4}>
-                        <Typography variant="body2" color="text.secondary">月:</Typography>
+                        <Typography variant="body2" color="text.secondary">Months:</Typography>
                         <Typography variant="h6">{dateResult.months}</Typography>
                       </Grid>
                       <Grid item xs={6} sm={4}>
-                        <Typography variant="body2" color="text.secondary">周:</Typography>
+                        <Typography variant="body2" color="text.secondary">Weeks:</Typography>
                         <Typography variant="h6">{dateResult.weeks}</Typography>
                       </Grid>
                       <Grid item xs={6} sm={4}>
-                        <Typography variant="body2" color="text.secondary">天:</Typography>
+                        <Typography variant="body2" color="text.secondary">Days:</Typography>
                         <Typography variant="h6">{dateResult.days}</Typography>
                       </Grid>
                       <Grid item xs={6} sm={4}>
-                        <Typography variant="body2" color="text.secondary">小时:</Typography>
+                        <Typography variant="body2" color="text.secondary">Hours:</Typography>
                         <Typography variant="h6">{dateResult.hours}</Typography>
                       </Grid>
                       <Grid item xs={6} sm={4}>
-                        <Typography variant="body2" color="text.secondary">分钟:</Typography>
+                        <Typography variant="body2" color="text.secondary">Minutes:</Typography>
                         <Typography variant="h6">{dateResult.minutes}</Typography>
                       </Grid>
                       <Grid item xs={12}>
-                        <Typography variant="body2" color="text.secondary">秒:</Typography>
+                        <Typography variant="body2" color="text.secondary">Seconds:</Typography>
                         <Typography variant="h6">{dateResult.seconds}</Typography>
                       </Grid>
                     </Grid>
@@ -259,7 +259,7 @@ export default function DateCalculator() {
                 {/* Replace MUI DatePicker with standard date input */}
                 <TextField
                   fullWidth
-                  label="选择日期"
+                  label="Select Date"
                   type="date"
                   value={formatDateForInput(addDate)}
                   onChange={(e) => setAddDate(new Date(e.target.value))}
@@ -270,7 +270,7 @@ export default function DateCalculator() {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="数值"
+                  label="Value"
                   type="number"
                   value={addValue}
                   onChange={(e) => setAddValue(e.target.value)}
@@ -280,19 +280,19 @@ export default function DateCalculator() {
               
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>
-                  <InputLabel>单位</InputLabel>
+                  <InputLabel>Unit</InputLabel>
                   <Select
                     value={addUnit}
-                    label="单位"
+                    label="Unit"
                     onChange={(e) => setAddUnit(e.target.value)}
                   >
-                    <MenuItem value="days">天</MenuItem>
-                    <MenuItem value="weeks">周</MenuItem>
-                    <MenuItem value="months">月</MenuItem>
-                    <MenuItem value="years">年</MenuItem>
-                    <MenuItem value="hours">小时</MenuItem>
-                    <MenuItem value="minutes">分钟</MenuItem>
-                    <MenuItem value="seconds">秒</MenuItem>
+                    <MenuItem value="days">Days</MenuItem>
+                    <MenuItem value="weeks">Weeks</MenuItem>
+                    <MenuItem value="months">Months</MenuItem>
+                    <MenuItem value="years">Years</MenuItem>
+                    <MenuItem value="hours">Hours</MenuItem>
+                    <MenuItem value="minutes">Minutes</MenuItem>
+                    <MenuItem value="seconds">Seconds</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
@@ -304,7 +304,7 @@ export default function DateCalculator() {
                   onClick={calculateAddDate}
                   fullWidth
                 >
-                  计算结果日期
+                  Calculate Result Date
                 </Button>
               </Grid>
               
@@ -312,9 +312,9 @@ export default function DateCalculator() {
                 <Grid item xs={12}>
                   <Paper elevation={3} sx={{ p: 3, mt: 2, borderRadius: 2, backgroundColor: '#fafafa' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                      <Typography variant="h6" color="primary">计算结果</Typography>
+                      <Typography variant="h6" color="primary">Calculation Result</Typography>
                       <IconButton 
-                        onClick={() => copyToClipboard(addResult.toLocaleString('zh-CN'))}
+                        onClick={() => copyToClipboard(addResult.toLocaleString('en-US'))}
                         color="primary"
                       >
                         <ContentCopyIcon />
@@ -323,7 +323,7 @@ export default function DateCalculator() {
                     <Divider sx={{ mb: 2 }} />
                     
                     <Typography variant="h6">
-                      {addResult.toLocaleString('zh-CN', {
+                      {addResult.toLocaleString('en-US', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',
@@ -341,7 +341,7 @@ export default function DateCalculator() {
         </CardContent>
       </Card>
 
-      {/* 工具下方广告 */}
+      {/* Ad below the tool */}
       <AdBanner slot="9900112233" />
 
       <Snackbar

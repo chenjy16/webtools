@@ -35,7 +35,7 @@ export default function JwtDecoder() {
 
   const decodeJwt = () => {
     if (!jwtToken.trim()) {
-      setError('请输入JWT令牌');
+      setError('Please enter the JWT token');
       setHeader({});
       setPayload({});
       return;
@@ -44,20 +44,20 @@ export default function JwtDecoder() {
     try {
       const parts = jwtToken.split('.');
       if (parts.length !== 3) {
-        throw new Error('无效的JWT格式，应包含三个部分');
+        throw new Error('Invalid JWT format, should contain three parts');
       }
 
-      // 解码头部
+      // Decode header
       const decodedHeader = JSON.parse(atob(parts[0]));
       setHeader(decodedHeader);
 
-      // 解码载荷
+      // Decode payload
       const decodedPayload = JSON.parse(atob(parts[1]));
       setPayload(decodedPayload);
 
       setError('');
     } catch (err) {
-      setError(`JWT解析错误: ${err.message}`);
+      setError(`JWT parsing error: ${err.message}`);
       setHeader({});
       setPayload({});
     }
@@ -72,7 +72,7 @@ export default function JwtDecoder() {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    showSnackbar('已复制到剪贴板', 'success');
+    showSnackbar('Copied to clipboard', 'success');
   };
 
   const showSnackbar = (message, severity) => {
@@ -81,27 +81,27 @@ export default function JwtDecoder() {
     setSnackbarOpen(true);
   };
 
-  // 格式化日期时间
+  // Format date and time
   const formatDateTime = (timestamp) => {
-    if (!timestamp) return '无效日期';
+    if (!timestamp) return 'Invalid date';
     try {
       const date = new Date(timestamp * 1000);
       return date.toLocaleString();
     } catch {
-      return '无效日期';
+      return 'Invalid date';
     }
   };
 
   return (
     <Box sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        JWT 解码器
+        JWT Decoder
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        解析和验证 JSON Web Token (JWT)，查看头部和载荷信息。
+        Parse and validate JSON Web Tokens (JWT), view header and payload information.
       </Typography>
 
-      {/* 工具上方广告 */}
+      {/* Ad above the tool */}
       <AdBanner slot="4455667788" />
 
       <Card sx={{ mb: 4, boxShadow: 3 }}>
@@ -110,7 +110,7 @@ export default function JwtDecoder() {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="输入JWT令牌"
+                label="Enter JWT Token"
                 variant="outlined"
                 multiline
                 rows={4}
@@ -127,7 +127,7 @@ export default function JwtDecoder() {
                 onClick={decodeJwt}
                 sx={{ height: '56px' }}
               >
-                解码
+                Decode
               </Button>
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -139,7 +139,7 @@ export default function JwtDecoder() {
                 startIcon={<DeleteIcon />}
                 sx={{ height: '56px' }}
               >
-                清除
+                Clear
               </Button>
             </Grid>
           </Grid>
@@ -153,15 +153,15 @@ export default function JwtDecoder() {
           {(Object.keys(header).length > 0 || Object.keys(payload).length > 0) && (
             <Box sx={{ mt: 3 }}>
               <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 2 }}>
-                <Tab label="头部 (Header)" />
-                <Tab label="载荷 (Payload)" />
+                <Tab label="Header" />
+                <Tab label="Payload" />
               </Tabs>
 
               {activeTab === 0 && (
                 <Paper elevation={3} sx={{ p: 3, borderRadius: 2, backgroundColor: '#fafafa' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="h6" color="primary">头部信息</Typography>
-                    <IconButton 
+                    <Typography variant="h6" color="primary">Header Information</Typography>
+                    <IconButton
                       onClick={() => copyToClipboard(JSON.stringify(header, null, 2))}
                       color="primary"
                     >
@@ -178,8 +178,8 @@ export default function JwtDecoder() {
               {activeTab === 1 && (
                 <Paper elevation={3} sx={{ p: 3, borderRadius: 2, backgroundColor: '#fafafa' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="h6" color="primary">载荷信息</Typography>
-                    <IconButton 
+                    <Typography variant="h6" color="primary">Payload Information</Typography>
+                    <IconButton
                       onClick={() => copyToClipboard(JSON.stringify(payload, null, 2))}
                       color="primary"
                     >
@@ -187,32 +187,32 @@ export default function JwtDecoder() {
                     </IconButton>
                   </Box>
                   <Divider sx={{ mb: 2 }} />
-                  
-                  {/* 特殊处理常见的JWT字段 */}
+
+                  {/* Special handling for common JWT fields */}
                   {payload.exp && (
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" color="text.secondary">过期时间 (exp)</Typography>
+                      <Typography variant="subtitle2" color="text.secondary">Expiration Time (exp)</Typography>
                       <Typography>{formatDateTime(payload.exp)}</Typography>
                       <Divider sx={{ my: 1 }} />
                     </Box>
                   )}
-                  
+
                   {payload.iat && (
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" color="text.secondary">签发时间 (iat)</Typography>
+                      <Typography variant="subtitle2" color="text.secondary">Issued At (iat)</Typography>
                       <Typography>{formatDateTime(payload.iat)}</Typography>
                       <Divider sx={{ my: 1 }} />
                     </Box>
                   )}
-                  
+
                   {payload.nbf && (
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" color="text.secondary">生效时间 (nbf)</Typography>
+                      <Typography variant="subtitle2" color="text.secondary">Not Before (nbf)</Typography>
                       <Typography>{formatDateTime(payload.nbf)}</Typography>
                       <Divider sx={{ my: 1 }} />
                     </Box>
                   )}
-                  
+
                   <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
                     {JSON.stringify(payload, null, 2)}
                   </pre>
@@ -223,7 +223,7 @@ export default function JwtDecoder() {
         </CardContent>
       </Card>
 
-      {/* 工具下方广告 */}
+      {/* Ad below the tool */}
       <AdBanner slot="4455667788" />
 
       <Snackbar
@@ -231,8 +231,8 @@ export default function JwtDecoder() {
         autoHideDuration={3000}
         onClose={() => setSnackbarOpen(false)}
       >
-        <Alert 
-          onClose={() => setSnackbarOpen(false)} 
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
           severity={snackbarSeverity}
           sx={{ width: '100%' }}
         >

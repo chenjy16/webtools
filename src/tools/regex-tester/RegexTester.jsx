@@ -42,18 +42,19 @@ export default function RegexTester() {
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [highlightedText, setHighlightedText] = useState('');
 
-  // 常用正则表达式示例
+  // Common regex examples
   const regexExamples = [
-    { name: '电子邮件', pattern: '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}' },
-    { name: '手机号码', pattern: '1[3-9]\\d{9}' },
+    { name: 'Email', pattern: '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}' },
+    { name: 'Phone Number', pattern: '1[3-9]\\d{9}' },
     { name: 'URL', pattern: 'https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)' },
-    { name: 'IP地址', pattern: '(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)' },
-    { name: '日期(YYYY-MM-DD)', pattern: '\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\\d|3[01])' }
+    { name: 'IP Address', pattern: '(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)' },
+    { name: 'Date (YYYY-MM-DD)', pattern: '\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\\d|3[01])' }
   ];
 
-  // 当正则表达式或测试字符串变化时，执行匹配
+  // Execute match when regex or test string changes
   useEffect(() => {
     testRegex();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [regexPattern, testString, flags]);
 
   const handleFlagChange = (flag) => {
@@ -71,7 +72,7 @@ export default function RegexTester() {
     if (!regexPattern || !testString) return;
 
     try {
-      // 构建标志字符串
+      // Build flags string
       let flagsStr = '';
       if (flags.global) flagsStr += 'g';
       if (flags.ignoreCase) flagsStr += 'i';
@@ -80,13 +81,13 @@ export default function RegexTester() {
       if (flags.unicode) flagsStr += 'u';
       if (flags.sticky) flagsStr += 'y';
 
-      // 创建正则表达式对象
+      // Create regex object
       const regex = new RegExp(regexPattern, flagsStr);
-      
-      // 执行匹配
+
+      // Execute match
       const matchResults = [];
       let match;
-      
+
       if (flags.global) {
         while ((match = regex.exec(testString)) !== null) {
           matchResults.push({
@@ -95,6 +96,10 @@ export default function RegexTester() {
             groups: match.slice(1),
             length: match[0].length
           });
+          // Prevent infinite loops with zero-width matches
+          if (match[0].length === 0) {
+            regex.lastIndex++;
+          }
         }
       } else {
         match = regex.exec(testString);
@@ -107,14 +112,14 @@ export default function RegexTester() {
           });
         }
       }
-      
+
       setMatches(matchResults);
-      
-      // 生成高亮文本
+
+      // Generate highlighted text
       generateHighlightedText(testString, matchResults);
-      
+
     } catch (err) {
-      setError(`正则表达式错误: ${err.message}`);
+      setError(`Regex error: ${err.message}`);
     }
   };
 
@@ -123,26 +128,26 @@ export default function RegexTester() {
       setHighlightedText(text);
       return;
     }
-    
-    // 按照匹配位置排序
+
+    // Sort matches by position
     const sortedMatches = [...matchResults].sort((a, b) => a.index - b.index);
-    
+
     let result = '';
     let lastIndex = 0;
-    
+
     sortedMatches.forEach((match) => {
-      // 添加匹配前的文本
+      // Add text before the match
       result += text.substring(lastIndex, match.index);
-      
-      // 添加带高亮的匹配文本
+
+      // Add highlighted match text
       result += `<mark style="background-color: #ffeb3b; padding: 0;">${text.substr(match.index, match.length)}</mark>`;
-      
+
       lastIndex = match.index + match.length;
     });
-    
-    // 添加最后一个匹配后的文本
+
+    // Add text after the last match
     result += text.substring(lastIndex);
-    
+
     setHighlightedText(result);
   };
 
@@ -152,7 +157,7 @@ export default function RegexTester() {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    showSnackbar('已复制到剪贴板', 'success');
+    showSnackbar('Copied to clipboard', 'success');
   };
 
   const showSnackbar = (message, severity) => {
@@ -164,13 +169,13 @@ export default function RegexTester() {
   return (
     <Box sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        正则表达式测试器
+        Regex Tester
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        测试和验证正则表达式，查看匹配结果和捕获组。
+        Test and validate regular expressions, view match results and capture groups.
       </Typography>
 
-      {/* 工具上方广告 */}
+      {/* Ad above the tool */}
       <AdBanner slot="6677889900" />
 
       <Card sx={{ mb: 4, boxShadow: 3 }}>
@@ -178,8 +183,8 @@ export default function RegexTester() {
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <Typography variant="subtitle1" sx={{ mr: 1 }}>正则表达式</Typography>
-                <Tooltip title="输入正则表达式，不需要包含斜杠和标志">
+                <Typography variant="subtitle1" sx={{ mr: 1 }}>Regular Expression</Typography>
+                <Tooltip title="Enter the regular expression, without slashes or flags">
                   <HelpOutlineIcon fontSize="small" color="action" />
                 </Tooltip>
               </Box>
@@ -188,51 +193,51 @@ export default function RegexTester() {
                 variant="outlined"
                 value={regexPattern}
                 onChange={(e) => setRegexPattern(e.target.value)}
-                placeholder="例如: [a-z]+\d+"
+                placeholder="e.g., [a-z]+\d+"
                 error={!!error}
                 helperText={error}
               />
             </Grid>
-            
+
             <Grid item xs={12}>
-              <Typography variant="subtitle1" sx={{ mb: 1 }}>标志</Typography>
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>Flags</Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
                 <FormControlLabel
                   control={<Checkbox checked={flags.global} onChange={() => handleFlagChange('global')} />}
                   label={
-                    <Tooltip title="全局匹配 - 查找所有匹配项">
-                      <Typography>g (全局)</Typography>
+                    <Tooltip title="Global match - find all matches">
+                      <Typography>g (Global)</Typography>
                     </Tooltip>
                   }
                 />
                 <FormControlLabel
                   control={<Checkbox checked={flags.ignoreCase} onChange={() => handleFlagChange('ignoreCase')} />}
                   label={
-                    <Tooltip title="忽略大小写">
-                      <Typography>i (忽略大小写)</Typography>
+                    <Tooltip title="Ignore case">
+                      <Typography>i (Ignore Case)</Typography>
                     </Tooltip>
                   }
                 />
                 <FormControlLabel
                   control={<Checkbox checked={flags.multiline} onChange={() => handleFlagChange('multiline')} />}
                   label={
-                    <Tooltip title="多行模式 - ^ 和 $ 匹配每一行的开始和结束">
-                      <Typography>m (多行)</Typography>
+                    <Tooltip title="Multiline mode - ^ and $ match the start and end of each line">
+                      <Typography>m (Multiline)</Typography>
                     </Tooltip>
                   }
                 />
                 <FormControlLabel
                   control={<Checkbox checked={flags.dotAll} onChange={() => handleFlagChange('dotAll')} />}
                   label={
-                    <Tooltip title="点号匹配所有字符，包括换行符">
-                      <Typography>s (点匹配所有)</Typography>
+                    <Tooltip title="Dot matches all characters, including newlines">
+                      <Typography>s (Dot All)</Typography>
                     </Tooltip>
                   }
                 />
                 <FormControlLabel
                   control={<Checkbox checked={flags.unicode} onChange={() => handleFlagChange('unicode')} />}
                   label={
-                    <Tooltip title="启用Unicode匹配">
+                    <Tooltip title="Enable Unicode matching">
                       <Typography>u (Unicode)</Typography>
                     </Tooltip>
                   }
@@ -240,16 +245,16 @@ export default function RegexTester() {
                 <FormControlLabel
                   control={<Checkbox checked={flags.sticky} onChange={() => handleFlagChange('sticky')} />}
                   label={
-                    <Tooltip title="粘性匹配 - 只从正则表达式的lastIndex位置开始匹配">
-                      <Typography>y (粘性)</Typography>
+                    <Tooltip title="Sticky match - only match from the regex's lastIndex position">
+                      <Typography>y (Sticky)</Typography>
                     </Tooltip>
                   }
                 />
               </Box>
             </Grid>
-            
+
             <Grid item xs={12}>
-              <Typography variant="subtitle1" sx={{ mb: 1 }}>测试文本</Typography>
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>Test String</Typography>
               <TextField
                 fullWidth
                 variant="outlined"
@@ -257,12 +262,12 @@ export default function RegexTester() {
                 rows={4}
                 value={testString}
                 onChange={(e) => setTestString(e.target.value)}
-                placeholder="输入要测试的文本..."
+                placeholder="Enter the text to test against..."
               />
             </Grid>
-            
+
             <Grid item xs={12}>
-              <Typography variant="subtitle1" sx={{ mb: 1 }}>常用正则表达式</Typography>
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>Common Regex Patterns</Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                 {regexExamples.map((example, index) => (
                   <Chip
@@ -276,13 +281,13 @@ export default function RegexTester() {
                 ))}
               </Box>
             </Grid>
-            
+
             {highlightedText && (
               <Grid item xs={12}>
                 <Paper elevation={3} sx={{ p: 3, mt: 2, borderRadius: 2, backgroundColor: '#fafafa' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="h6" color="primary">匹配结果</Typography>
-                    <IconButton 
+                    <Typography variant="h6" color="primary">Match Results</Typography>
+                    <IconButton
                       onClick={() => copyToClipboard(matches.map(m => m.value).join('\n'))}
                       color="primary"
                       disabled={matches.length === 0}
@@ -291,19 +296,19 @@ export default function RegexTester() {
                     </IconButton>
                   </Box>
                   <Divider sx={{ mb: 2 }} />
-                  
+
                   <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
-                    找到 {matches.length} 个匹配项
+                    Found {matches.length} match(es)
                   </Typography>
-                  
-                  <Paper variant="outlined" sx={{ p: 2, mb: 2, backgroundColor: 'white' }}>
+
+                  <Paper variant="outlined" sx={{ p: 2, mb: 2, backgroundColor: 'white', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
                     <div dangerouslySetInnerHTML={{ __html: highlightedText }} />
                   </Paper>
-                  
+
                   {matches.length > 0 && (
                     <Box>
                       <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
-                        匹配详情
+                        Match Details
                       </Typography>
                       <List dense>
                         {matches.map((match, index) => (
@@ -312,10 +317,10 @@ export default function RegexTester() {
                               primary={
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                   <Typography variant="body2">
-                                    匹配 #{index + 1}: <strong>{match.value}</strong>
+                                    Match #{index + 1}: <strong>{match.value}</strong>
                                   </Typography>
                                   <Typography variant="body2" color="text.secondary">
-                                    位置: {match.index}
+                                    Index: {match.index}
                                   </Typography>
                                 </Box>
                               }
@@ -323,11 +328,11 @@ export default function RegexTester() {
                                 match.groups.length > 0 ? (
                                   <Box sx={{ mt: 1 }}>
                                     <Typography variant="body2" color="text.secondary">
-                                      捕获组:
+                                      Capture Groups:
                                     </Typography>
                                     {match.groups.map((group, groupIndex) => (
                                       <Typography key={groupIndex} variant="body2">
-                                        组 {groupIndex + 1}: {group || '(空)'}
+                                        Group {groupIndex + 1}: {group || '(empty)'}
                                       </Typography>
                                     ))}
                                   </Box>
@@ -346,7 +351,7 @@ export default function RegexTester() {
         </CardContent>
       </Card>
 
-      {/* 工具下方广告 */}
+      {/* Ad below the tool */}
       <AdBanner slot="6677889900" />
 
       <Snackbar
@@ -354,8 +359,8 @@ export default function RegexTester() {
         autoHideDuration={3000}
         onClose={() => setSnackbarOpen(false)}
       >
-        <Alert 
-          onClose={() => setSnackbarOpen(false)} 
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
           severity={snackbarSeverity}
           sx={{ width: '100%' }}
         >

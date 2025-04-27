@@ -1,15 +1,30 @@
-import { Box, Typography, Link } from '@mui/material';
+import { Box, Typography, Link, Stack } from '@mui/material';
 
 export default function Footer() {
   return (
-    <Box sx={{ mt: 4, py: 3, textAlign: 'center', borderTop: '1px solid #eee' }}>
-      <Typography variant="body2" color="text.secondary">
-        © {new Date().getFullYear()} WebTools - 在线工具集
-      </Typography>
-      <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-        本网站使用 Google AdSense 提供的广告服务。
-        <Link href="/privacy-policy" sx={{ ml: 1 }}>隐私政策</Link>
-      </Typography>
+    <Box
+      component="footer"
+      sx={{
+        mt: 'auto',
+        py: 4,
+        px: 2,
+        bgcolor: 'background.paper',
+        borderTop: '1px solid #e0e0e0',
+        boxShadow: '0 -2px 8px rgba(0,0,0,0.04)',
+        borderRadius: { xs: '16px 16px 0 0', md: '24px 24px 0 0' },
+        textAlign: 'center',
+        maxWidth: 800,
+        mx: 'auto'
+      }}
+    >
+    <Stack spacing={1} sx={{ textAlign: 'center', mt: 4, mb: 2 }}> {/* Added alignment and margin */}
+        <Typography variant="body2" color="text.secondary">
+          Free Online Tools | Your Daily Helper for Developers
+        </Typography>
+        <Typography variant="caption" color="text.disabled">
+          © Tool.blog {new Date().getFullYear()} | <Link href="/about" color="inherit" underline="hover">About Us</Link>
+        </Typography>
+    </Stack>
     </Box>
   );
 }
