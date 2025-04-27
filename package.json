@@ -15,10 +15,15 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^7.0.2",
     "@mui/material": "^7.0.2",
+    "@mui/x-date-pickers": "^8.1.0",
+    "clean-css": "^5.3.3",
+    "date-fns": "^4.1.0",
+    "js-beautify": "^1.15.4",
     "qrcode": "^1.5.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^6.30.0",
+    "terser": "^5.39.0",
     "wrangler": "^4.13.2"
   },
   "devDependencies": {

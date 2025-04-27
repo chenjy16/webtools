@@ -11,5 +11,10 @@ export default defineConfig({
         assetFileNames: `assets/[name].[ext]`
       }
     }
+  },
+  define: {
+    'process.env': {},
+    '__require.resolve': 'path => path',
+    'global': 'window'
   }
 })

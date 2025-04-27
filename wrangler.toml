@@ -3,6 +3,11 @@ name = "webtools"
 # 添加兼容性日期配置
 compatibility_date = "2025-04-26"
 
+# 添加自定义域名配置
+routes = [
+  { pattern = "tool.blog/*", zone_name = "tool.blog" }
+]
+
 [site]
 bucket = "./dist"
 entry-point = "workers-site"
