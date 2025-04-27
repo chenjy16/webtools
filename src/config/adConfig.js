@@ -20,6 +20,8 @@ export const adConfig = {
       timer: '7788990011',
       codeFormatter: '8899001122',
       unitConverter: '9900112233',
+      // 添加新工具的广告位
+      newTool: '0011223344'
     }
   },
   

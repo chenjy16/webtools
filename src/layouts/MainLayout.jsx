@@ -43,6 +43,8 @@ const toolData = [
   { name: 'Timer Tool', path: '/timer', icon: lazy(() => import('@mui/icons-material/Timer')) },
   { name: 'Code Formatter/Minifier', path: '/code-formatter', icon: lazy(() => import('@mui/icons-material/FormatIndentIncrease')) },
   { name: 'Unit Converter', path: '/unit-converter', icon: lazy(() => import('@mui/icons-material/SwapHoriz')) },
+  // 添加新工具的路由项
+  { name: 'CurrencyConverter', path: '/CurrencyConverter', icon: lazy(() => import('@mui/icons-material/Add')) }
 ];
 
 export default function MainLayout() {

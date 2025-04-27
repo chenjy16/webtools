@@ -3,6 +3,7 @@ import MainLayout from './layouts/MainLayout';
 import { lazy, Suspense } from 'react';
 import { Box, CircularProgress } from '@mui/material';
 import './App.css';
+import CurrencyConverter from './tools/currency-converter/CurrencyConverter';
 
 // 懒加载各个工具组件
 const PasswordGenerator = lazy(() => import('./tools/password-generator/PasswordGenerator'));
@@ -63,6 +64,8 @@ function App() {
             <Route path="timer" element={<Timer />} />
             <Route path="code-formatter" element={<CodeFormatter />} />
             <Route path="unit-converter" element={<UnitConverter />} />
+            {/* 添加新工具路由 */}
+            <Route path="CurrencyConverter" element={<CurrencyConverter />} />
             <Route path="about" element={<About />} />
           </Route>
         </Routes>
