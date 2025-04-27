@@ -13,8 +13,9 @@ export default defineConfig({
     }
   },
   define: {
-    'process.env': {},
-    '__require.resolve': 'path => path',
+    'process.env': '{}',
+    // Change the arrow function to a string representation
+    '__require.resolve': '"function(path) { return path; }"',
     'global': 'window'
   }
 })
