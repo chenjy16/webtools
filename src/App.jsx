@@ -8,11 +8,9 @@ import CurrencyConverter from './tools/currency-converter/CurrencyConverter';
 // 懒加载各个工具组件
 const PasswordGenerator = lazy(() => import('./tools/password-generator/PasswordGenerator'));
 const JsonFormatter = lazy(() => import('./tools/json-formatter/JsonFormatter'));
-// 移除图片转换组件导入
-// const ImageConverter = lazy(() => import('./tools/image-converter/ImageConverter'));
+// 添加图片压缩组件导入
+const ImageCompressor = lazy(() => import('./tools/image-compressor/ImageCompressor'));
 const HmacCalculator = lazy(() => import('./tools/hmac-calculator/HmacCalculator'));
-// 移除文件转换组件导入
-// const FileConverter = lazy(() => import('./tools/file-converter/FileConverter'));
 const QRCodeGenerator = lazy(() => import('./tools/qrcode-generator/QRCodeGenerator'));
 const UrlEncoder = lazy(() => import('./tools/url-encoder/UrlEncoder'));
 const Base64Converter = lazy(() => import('./tools/base64-converter/Base64Converter'));
@@ -58,8 +56,8 @@ function App() {
             <Route index element={<Navigate to="/password-generator" replace />} />
             <Route path="password-generator" element={<PasswordGenerator />} />
             <Route path="json-formatter" element={<JsonFormatter />} />
-            {/* 移除图片转换路由 */}
-            {/* <Route path="image-converter" element={<ImageConverter />} /> */}
+            {/* 添加图片压缩路由 */}
+            <Route path="image-compressor" element={<ImageCompressor />} />
             <Route path="hmac-calculator" element={<HmacCalculator />} />
             {/* 移除文件转换路由 */}
             {/* <Route path="file-converter" element={<FileConverter />} /> */}
