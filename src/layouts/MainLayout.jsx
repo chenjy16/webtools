@@ -29,7 +29,6 @@ const minDrawerWidth = 180;
 const maxDrawerWidth = 400;
 
 // --- Tool Data (for titles, descriptions, etc.) ---
-// (Keep your toolData array definition here as before)
 const toolData = [
   { name: 'Password Generator', path: '/password-generator' },
   { name: 'JSON Formatter', path: '/json-formatter' },
@@ -49,9 +48,10 @@ const toolData = [
   { name: 'Currency Converter', path: '/CurrencyConverter' },
   { name: 'Mortgage Calculator', path: '/mortgage-calculator' },
   { name: 'Country Information Finder', path: '/country-info' },
-  { name: 'Mock Data Generator', path: '/fake-data-generator' }, // Renamed from Personal Address...
+  { name: 'Mock Data Generator', path: '/fake-data-generator' },
   { name: 'Cron Expression Generator', path: '/cron-generator' },
-  { name: 'Image Compressor', path: '/image-compressor' }
+  { name: 'Image Compressor', path: '/image-compressor' },
+  { name: 'PDF Tools', path: '/pdf-tools' } // 添加 PDF 工具
 ];
 
 // 添加工具描述对象
@@ -77,7 +77,8 @@ const descriptions = {
   '/country-info': 'Find country information, including population, currency, time zones, and more.',
   '/fake-data-generator': 'Generate mock personal data for testing and development purposes.',
   '/cron-generator': 'Create and parse Cron expressions for task scheduling.',
-  '/image-compressor': 'Compress and convert images to reduce file size while maintaining quality.'
+  '/image-compressor': 'Compress and convert images to reduce file size while maintaining quality.',
+  '/pdf-tools': 'Merge multiple PDF files into one document or split a PDF into individual pages.' // 添加 PDF 工具描述
 };
 
 // --- Main Layout Component ---

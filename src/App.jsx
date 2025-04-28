@@ -4,6 +4,7 @@ import { lazy, Suspense } from 'react';
 import { Box, CircularProgress } from '@mui/material';
 import './App.css';
 import CurrencyConverter from './tools/currency-converter/CurrencyConverter';
+import PdfTools from './tools/pdf-tools/PdfTools';
 
 // 懒加载各个工具组件
 const PasswordGenerator = lazy(() => import('./tools/password-generator/PasswordGenerator'));
@@ -84,6 +85,9 @@ function App() {
             <Route path="fake-data-generator" element={<FakeDataGenerator />} />
             {/* 添加Cron表达式生成与解析器路由 */}
             <Route path="cron-generator" element={<CronGenerator />} />
+            <Route path="image-compressor" element={<ImageCompressor />} />
+            <Route path="pdf-tools" element={<PdfTools />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
       </Suspense>

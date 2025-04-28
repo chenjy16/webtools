@@ -33,6 +33,7 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PublicIcon from '@mui/icons-material/Public';
 import HomeIcon from '@mui/icons-material/Home';
 import DataArrayIcon from '@mui/icons-material/DataArray';
+import DescriptionIcon from '@mui/icons-material/Description'; // 添加 PDF 图标
 
 // 图标映射表
 const iconMap = {
@@ -54,7 +55,8 @@ const iconMap = {
   'AttachMoney': AttachMoneyIcon,
   'Public': PublicIcon,
   'Home': HomeIcon,
-  'DataArray': DataArrayIcon
+  'DataArray': DataArrayIcon,
+  'Description': DescriptionIcon // 添加 PDF 图标映射
 };
 
 const toolCategories = [
@@ -83,6 +85,7 @@ const toolCategories = [
     id: 'media',
     name: 'Image & Media Tools',
     tools: [
+      { name: 'PDF Tools', path: '/pdf-tools', icon: 'Description' },
       { name: 'QR Code Generator', path: '/qrcode-generator', icon: 'QrCode' },
       { name: 'Image Compressor & Converter', path: '/image-compressor', icon: 'Image' },
       { name: 'Color Code Converter', path: '/color-converter', icon: 'ColorLens' }
