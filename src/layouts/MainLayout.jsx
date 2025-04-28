@@ -48,7 +48,9 @@ const toolData = [
   { name: 'Mortgage Calculator', path: '/mortgage-calculator', icon: lazy(() => import('@mui/icons-material/Home')) },
   { name: 'Country Information Finder', path: '/country-info', icon: lazy(() => import('@mui/icons-material/Public')) },
   // 添加假数据生成器
-  { name: 'Personal Address Information Data Generator', path: '/fake-data-generator', icon: lazy(() => import('@mui/icons-material/DataArray')) }
+  { name: 'Personal Address Information Data Generator', path: '/fake-data-generator', icon: lazy(() => import('@mui/icons-material/DataArray')) },
+  // 添加Cron表达式生成与解析器
+  { name: 'Cron Expression Generator', path: '/cron-generator', icon: lazy(() => import('@mui/icons-material/Schedule')) }
 ];
 
 export default function MainLayout() {

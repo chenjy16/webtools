@@ -37,6 +37,11 @@ const MortgageCalculator = lazy(() => import('./tools/mortgage-calculator/Mortga
 // 添加假数据生成器组件
 const FakeDataGenerator = lazy(() => import('./tools/fake-data-generator/FakeDataGenerator'));
 
+// 添加Cron生成器组件
+const CronGenerator = lazy(() => import('./tools/cron-generator/CronGenerator'));
+
+
+
 // 加载指示器
 const LoadingFallback = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -79,6 +84,8 @@ function App() {
             <Route path="about" element={<About />} />
             {/* 添加假数据生成器路由 */}
             <Route path="fake-data-generator" element={<FakeDataGenerator />} />
+            {/* 添加Cron表达式生成与解析器路由 */}
+            <Route path="cron-generator" element={<CronGenerator />} />
           </Route>
         </Routes>
       </Suspense>

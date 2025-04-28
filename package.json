@@ -18,6 +18,7 @@
     "@mui/material": "^7.0.2",
     "@mui/x-date-pickers": "^8.1.0",
     "clean-css": "^5.3.3",
+    "cronstrue": "^2.59.0",
     "date-fns": "^4.1.0",
     "js-beautify": "^1.15.4",
     "qrcode": "^1.5.4",
