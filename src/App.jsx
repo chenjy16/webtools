@@ -57,11 +57,7 @@ function App() {
             <Route index element={<Navigate to="/password-generator" replace />} />
             <Route path="password-generator" element={<PasswordGenerator />} />
             <Route path="json-formatter" element={<JsonFormatter />} />
-            {/* 添加图片压缩路由 */}
-            <Route path="image-compressor" element={<ImageCompressor />} />
             <Route path="hmac-calculator" element={<HmacCalculator />} />
-            {/* 移除文件转换路由 */}
-            {/* <Route path="file-converter" element={<FileConverter />} /> */}
             <Route path="qrcode-generator" element={<QRCodeGenerator />} />
             <Route path="url-encoder" element={<UrlEncoder />} />
             <Route path="base64-converter" element={<Base64Converter />} />
