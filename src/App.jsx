@@ -27,7 +27,12 @@ const RegexTester = lazy(() => import('./tools/regex-tester/RegexTester'));
 const Timer = lazy(() => import('./tools/timer/Timer'));
 const CodeFormatter = lazy(() => import('./tools/code-formatter/CodeFormatter'));
 const UnitConverter = lazy(() => import('./tools/unit-converter/UnitConverter'));
+// 添加国家信息百科组件
+const CountryInfo = lazy(() => import('./tools/country-info/CountryInfo'));
 const About = lazy(() => import('./pages/About')); // 添加这一行，懒加载 About 组件
+
+// 添加房贷计算器组件
+const MortgageCalculator = lazy(() => import('./tools/mortgage-calculator/MortgageCalculator'));
 
 // 加载指示器
 const LoadingFallback = () => (
@@ -66,6 +71,8 @@ function App() {
             <Route path="unit-converter" element={<UnitConverter />} />
             {/* 添加新工具路由 */}
             <Route path="CurrencyConverter" element={<CurrencyConverter />} />
+            <Route path="mortgage-calculator" element={<MortgageCalculator />} />
+            <Route path="country-info" element={<CountryInfo />} />
             <Route path="about" element={<About />} />
           </Route>
         </Routes>

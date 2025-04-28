@@ -44,7 +44,9 @@ const toolData = [
   { name: 'Code Formatter/Minifier', path: '/code-formatter', icon: lazy(() => import('@mui/icons-material/FormatIndentIncrease')) },
   { name: 'Unit Converter', path: '/unit-converter', icon: lazy(() => import('@mui/icons-material/SwapHoriz')) },
   // 添加新工具的路由项
-  { name: 'CurrencyConverter', path: '/CurrencyConverter', icon: lazy(() => import('@mui/icons-material/Add')) }
+  { name: 'Currency Converter', path: '/CurrencyConverter', icon: lazy(() => import('@mui/icons-material/AttachMoney')) },
+  { name: 'Mortgage Calculator', path: '/mortgage-calculator', icon: lazy(() => import('@mui/icons-material/Home')) },
+  { name: 'Country Information Finder', path: '/country-info', icon: lazy(() => import('@mui/icons-material/Public')) }
 ];
 
 export default function MainLayout() {

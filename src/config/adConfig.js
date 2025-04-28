@@ -21,7 +21,8 @@ export const adConfig = {
       codeFormatter: '8899001122',
       unitConverter: '9900112233',
       // 添加新工具的广告位
-      newTool: '0011223344'
+      newTool: '0011223344',
+      countryInfo: '0022334455'
     }
   },
   
