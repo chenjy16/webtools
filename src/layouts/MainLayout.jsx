@@ -46,7 +46,9 @@ const toolData = [
   // 添加新工具的路由项
   { name: 'Currency Converter', path: '/CurrencyConverter', icon: lazy(() => import('@mui/icons-material/AttachMoney')) },
   { name: 'Mortgage Calculator', path: '/mortgage-calculator', icon: lazy(() => import('@mui/icons-material/Home')) },
-  { name: 'Country Information Finder', path: '/country-info', icon: lazy(() => import('@mui/icons-material/Public')) }
+  { name: 'Country Information Finder', path: '/country-info', icon: lazy(() => import('@mui/icons-material/Public')) },
+  // 添加假数据生成器
+  { name: 'Personal Address Information Data Generator', path: '/fake-data-generator', icon: lazy(() => import('@mui/icons-material/DataArray')) }
 ];
 
 export default function MainLayout() {

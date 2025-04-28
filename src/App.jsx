@@ -34,6 +34,9 @@ const About = lazy(() => import('./pages/About')); // 添加这一行，懒加�
 // 添加房贷计算器组件
 const MortgageCalculator = lazy(() => import('./tools/mortgage-calculator/MortgageCalculator'));
 
+// 添加假数据生成器组件
+const FakeDataGenerator = lazy(() => import('./tools/fake-data-generator/FakeDataGenerator'));
+
 // 加载指示器
 const LoadingFallback = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -74,6 +77,8 @@ function App() {
             <Route path="mortgage-calculator" element={<MortgageCalculator />} />
             <Route path="country-info" element={<CountryInfo />} />
             <Route path="about" element={<About />} />
+            {/* 添加假数据生成器路由 */}
+            <Route path="fake-data-generator" element={<FakeDataGenerator />} />
           </Route>
         </Routes>
       </Suspense>
