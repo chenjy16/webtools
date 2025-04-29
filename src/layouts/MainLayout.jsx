@@ -100,10 +100,10 @@ export default function MainLayout({ toggleDarkMode, currentMode = 'light' }) {
   const currentTool = toolData.find(t => t.path === location.pathname) || { name: 'Web Tools', path: '/' };
 
   // SEO 元数据
-  const siteName = 'Tool.blog - Free Online Developer Utilities';
+  const siteName = 'CDTools - Free Online Developer Utilities';
   const title = currentTool.path === '/' ? siteName : `${currentTool.name} | ${siteName}`;
   const description = descriptions[currentTool.path] || `A collection of free online web tools like ${currentTool.name ? currentTool.name + ', ' : ''}formatters, converters, and generators for developers and designers.`;
-  const canonicalUrl = `https://tool.blog${location.pathname}`;
+  const canonicalUrl = `https://cdtools.org${location.pathname}`;
 
   // --- 抽屉宽度状态和调整逻辑 ---
   const [drawerWidth, setDrawerWidth] = useState(() => {
