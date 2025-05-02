@@ -40,3 +40,54 @@
 .read-the-docs {
   color: #888;
 }
+
+/* 全局响应式样式 */
+@media (max-width: 600px) {
+  /* 调整小屏幕上的文本大小 */
+  h1, .MuiTypography-h4 {
+    font-size: 1.5rem !important;
+  }
+  
+  h2, .MuiTypography-h5 {
+    font-size: 1.25rem !important;
+  }
+  
+  h3, .MuiTypography-h6 {
+    font-size: 1.1rem !important;
+  }
+  
+  /* 确保表单元素在移动设备上可用 */
+  .MuiTextField-root, .MuiButton-root {
+    margin-bottom: 12px !important;
+  }
+  
+  /* 调整卡片内边距 */
+  .MuiCardContent-root {
+    padding: 12px !important;
+  }
+  
+  /* 确保图像不会溢出容器 */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* 确保内容不会被底部导航栏遮挡 */
+@media (max-width: 600px) {
+  .MuiContainer-root {
+    padding-bottom: 70px;
+  }
+}
+
+/* 改善移动设备上的触摸目标 */
+@media (max-width: 600px) {
+  .MuiButton-root, .MuiIconButton-root {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .MuiListItem-root {
+    min-height: 44px;
+  }
+}

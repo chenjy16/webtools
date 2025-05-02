@@ -22,7 +22,7 @@ import {
 } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import AdBanner from '../../components/AdBanner';
+
 
 export default function RegexTester() {
   const [regexPattern, setRegexPattern] = useState('');
@@ -175,8 +175,8 @@ export default function RegexTester() {
         Test and validate regular expressions, view match results and capture groups.
       </Typography>
 
-      {/* Ad above the tool */}
-      <AdBanner slot="6677889900" />
+      {/* 移除 AdBanner 组件 */}
+      {/* <AdBanner slot="6677889900" /> */}
 
       <Card sx={{ mb: 4, boxShadow: 3 }}>
         <CardContent>
@@ -351,8 +351,7 @@ export default function RegexTester() {
         </CardContent>
       </Card>
 
-      {/* Ad below the tool */}
-      <AdBanner slot="6677889900" />
+
 
       <Snackbar
         open={snackbarOpen}

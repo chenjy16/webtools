@@ -22,7 +22,7 @@ import {
 } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
-import AdBanner from '../../components/AdBanner';
+
 
 export default function UnitConverter() {
   const [activeTab, setActiveTab] = useState(0);
@@ -288,8 +288,7 @@ export default function UnitConverter() {
         Perform fast and accurate conversions between different units.
       </Typography>
 
-      {/* Ad above the tool */}
-      <AdBanner slot="9900112233" />
+
 
       <Card sx={{ mb: 4, boxShadow: 3 }}>
         <CardContent>
@@ -395,8 +394,7 @@ export default function UnitConverter() {
         </CardContent>
       </Card>
 
-      {/* Ad below the tool */}
-      <AdBanner slot="9900112233" />
+ 
 
       <Snackbar
         open={snackbarOpen}

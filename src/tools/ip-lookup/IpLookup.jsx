@@ -18,11 +18,16 @@ import {
   TableCell,
   TableContainer,
   TableRow,
-  Tooltip
+  Tooltip,
+  Fade
 } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import SearchIcon from '@mui/icons-material/Search';
+import CloseIcon from '@mui/icons-material/Close';
+import ToolLayout from '../../components/ToolLayout';
 import AdBanner from '../../components/AdBanner';
+import { adConfig } from '../../config/adConfig';
+
 
 export default function IpLookup() {
   const [userIp, setUserIp] = useState('');
@@ -33,6 +38,17 @@ export default function IpLookup() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  // 添加状态控制操作后广告显示
+  const [showPostActionAd, setShowPostActionAd] = useState(false);
+  
+  // 在组件卸载时清除定时器
+  useEffect(() => {
+    let adTimer;
+    
+    return () => {
+      if (adTimer) clearTimeout(adTimer);
+    };
+  }, []);
 
   // Get user's current IP
   useEffect(() => {
@@ -68,6 +84,15 @@ export default function IpLookup() {
       }
 
       setIpInfo(data);
+      
+      // 查询成功后显示广告
+      setShowPostActionAd(true);
+      
+      // 设置定时器，10秒后自动关闭广告
+      const adTimer = setTimeout(() => {
+        setShowPostActionAd(false);
+      }, 10000);
+      
     } catch (err) {
       setError(`IP information query failed: ${err.message}`);
       setIpInfo(null);
@@ -91,6 +116,11 @@ export default function IpLookup() {
     setSnackbarSeverity(severity);
     setSnackbarOpen(true);
   };
+  
+  // 关闭广告的处理函数
+  const handleCloseAd = () => {
+    setShowPostActionAd(false);
+  };
 
   return (
     <Box sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
@@ -100,9 +130,6 @@ export default function IpLookup() {
       <Typography variant="body1" color="text.secondary" paragraph>
         Query detailed information for any IP address, including geolocation, ISP, and network information.
       </Typography>
-
-      {/* Ad above the tool */}
-      <AdBanner slot="3344556677" />
 
       <Card sx={{ mb: 4, boxShadow: 3 }}>
         <CardContent>
@@ -232,11 +259,42 @@ export default function IpLookup() {
               </TableContainer>
             </Paper>
           )}
+          
+          {/* 操作完成后显示的广告 */}
+          {showPostActionAd && ipInfo && (
+            <Fade in={showPostActionAd} timeout={500}>
+              <Paper 
+                elevation={3} 
+                sx={{ 
+                  mt: 3, 
+                  p: 2, 
+                  position: 'relative',
+                  borderRadius: 2,
+                  border: '1px solid #e0e0e0',
+                  backgroundColor: '#f9f9f9'
+                }}
+              >
+                <Box sx={{ position: 'absolute', top: 5, right: 5, zIndex: 2 }}>
+                  <IconButton size="small" onClick={handleCloseAd} aria-label="关闭广告">
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+                
+                <Typography variant="caption" sx={{ display: 'block', mb: 1, color: 'text.secondary', fontSize: '0.7rem' }}>
+                Promoted Content
+                </Typography>
+                
+                <AdBanner
+                  slot={adConfig.postAction ? adConfig.postAction.slot : adConfig.inContent.slot}
+                  format="horizontal"
+                  responsive={true}
+                  lazyLoad={false}
+                />
+              </Paper>
+            </Fade>
+          )}
         </CardContent>
       </Card>
-
-      {/* Ad below the tool */}
-      <AdBanner slot="3344556677" />
 
       <Snackbar
         open={snackbarOpen}

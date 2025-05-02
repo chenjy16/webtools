@@ -1,32 +1,24 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import AdBanner from '../components/AdBanner';
 import Footer from '../components/Footer';
-import CategorizedSidebar from '../components/CategorizedSidebar';
+import TopNavigation from '../components/TopNavigation';
 import {
   AppBar,
   Box,
   Container,
   CssBaseline,
-  Divider,
-  Drawer,
   IconButton,
   Toolbar,
   Typography,
   useMediaQuery,
   useTheme,
-  Paper
+  Tooltip
 } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
-import DragHandleIcon from '@mui/icons-material/DragHandle';
-
-// --- Constants ---
-const defaultDrawerWidth = 240;
-const minDrawerWidth = 180;
-const maxDrawerWidth = 400;
+import { adConfig } from '../config/adConfig';
 
 // --- Tool Data (for titles, descriptions, etc.) ---
 const toolData = [
@@ -48,13 +40,15 @@ const toolData = [
   { name: 'Currency Converter', path: '/CurrencyConverter' },
   { name: 'Mortgage Calculator', path: '/mortgage-calculator' },
   { name: 'Country Information Finder', path: '/country-info' },
-  { name: 'Mock Data Generator', path: '/fake-data-generator' },
+  { name: 'Personal Address Information Generator', path: '/fake-data-generator' },
   { name: 'Cron Expression Generator', path: '/cron-generator' },
   { name: 'Image Compressor', path: '/image-compressor' },
-  { name: 'PDF Tools', path: '/pdf-tools' } // 添加 PDF 工具
+  { name: 'PDF Tools', path: '/pdf-tools' },
+  { name: 'Temporary Email Generator', path: '/temp-mail' },
+  { name: 'Public Holidays', path: '/public-holidays' },
+  { name: 'Pomodoro Timer', path: '/pomodoro' } // 添加番茄钟工具
 ];
 
-// 添加工具描述对象
 const descriptions = {
   '/': 'A collection of free online developer tools, including formatting, conversion, and generator tools, to enhance your work efficiency.',
   '/password-generator': 'Generate secure, random passwords with customizable length and character types.',
@@ -78,293 +72,152 @@ const descriptions = {
   '/fake-data-generator': 'Generate mock personal data for testing and development purposes.',
   '/cron-generator': 'Create and parse Cron expressions for task scheduling.',
   '/image-compressor': 'Compress and convert images to reduce file size while maintaining quality.',
-  '/pdf-tools': 'Merge multiple PDF files into one document or split a PDF into individual pages.' // 添加 PDF 工具描述
+  '/pdf-tools': 'Merge multiple PDF files into one document or split a PDF into individual pages.',
+  '/temp-mail': 'Create a temporary email address to receive emails and protect your privacy. Powered by the mail.tm API.',
+  '/public-holidays': 'Check public holiday information for countries and regions around the world. Supports multiple countries and regions.'
 };
 
 // --- Main Layout Component ---
-// Assume `toggleDarkMode` function is passed as a prop or obtained from context
 export default function MainLayout({ toggleDarkMode, currentMode = 'light' }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
-    // 从本地存储中获取侧边栏状态
-    const saved = localStorage.getItem('sidebarCollapsed');
-    return saved ? JSON.parse(saved) : false;
-  });
 
   const location = useLocation();
   const navigate = useNavigate();
 
-  // 确定当前工具以设置标题/描述
   const currentTool = toolData.find(t => t.path === location.pathname) || { name: 'Web Tools', path: '/' };
-
-  // SEO 元数据
   const siteName = 'CDTools - Free Online Developer Utilities';
   const title = currentTool.path === '/' ? siteName : `${currentTool.name} | ${siteName}`;
   const description = descriptions[currentTool.path] || `A collection of free online web tools like ${currentTool.name ? currentTool.name + ', ' : ''}formatters, converters, and generators for developers and designers.`;
   const canonicalUrl = `https://cdtools.org${location.pathname}`;
 
-  // --- 抽屉宽度状态和调整逻辑 ---
-  const [drawerWidth, setDrawerWidth] = useState(() => {
-    if (sidebarCollapsed) return minDrawerWidth;
-    const savedWidth = localStorage.getItem('drawerWidth');
-    const parsedWidth = savedWidth ? parseInt(savedWidth, 10) : defaultDrawerWidth;
-    return Math.min(Math.max(parsedWidth, minDrawerWidth), maxDrawerWidth);
-  });
-  const [isResizing, setIsResizing] = useState(false);
-  const sidebarRef = useRef(null);
-
-  // 当宽度变化时保存到localStorage
-  useEffect(() => {
-    localStorage.setItem('drawerWidth', drawerWidth.toString());
-  }, [drawerWidth]);
-
-  // 保存侧边栏折叠状态
-  useEffect(() => {
-    localStorage.setItem('sidebarCollapsed', JSON.stringify(sidebarCollapsed));
-  }, [sidebarCollapsed]);
-
-  // 鼠标移动处理器用于调整大小
-  const handleMouseMove = useCallback((e) => {
-    if (!isResizing) return;
-    
-    // 计算新宽度，确保在限制范围内
-    const newWidth = Math.min(
-      Math.max(e.clientX, minDrawerWidth),
-      maxDrawerWidth
-    );
-    
-    setDrawerWidth(newWidth);
-    
-    // 防止文本选择
-    e.preventDefault();
-  }, [isResizing]);
-
-  // 鼠标抬起处理器停止调整大小
-  const handleMouseUp = useCallback(() => {
-    if (!isResizing) return;
-    
-    setIsResizing(false);
-    document.body.style.cursor = '';
-    document.body.style.userSelect = '';
-    
-    // 移除全局事件监听器
-    window.removeEventListener('mousemove', handleMouseMove);
-    window.removeEventListener('mouseup', handleMouseUp);
-  }, [handleMouseMove, isResizing]);
-
-  // 鼠标按下处理器开始调整大小
-  const startResizing = useCallback((e) => {
-    if (sidebarCollapsed) return; // 折叠时不允许调整大小
-    
-    e.preventDefault();
-    setIsResizing(true);
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
-    
-    // 添加全局事件监听器
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-  }, [handleMouseMove, handleMouseUp, sidebarCollapsed]);
-
-  // --- 抽屉切换和导航 ---
-  const handleDrawerToggle = () => setMobileOpen(prev => !prev);
-  
-  // 侧边栏折叠/展开功能
-  const toggleSidebarCollapse = () => {
-    setSidebarCollapsed(prev => {
-      const newState = !prev;
-      if (newState) {
-        // 如果要折叠，保存当前宽度并设置为最小宽度
-        localStorage.setItem('previousDrawerWidth', drawerWidth.toString());
-        setDrawerWidth(minDrawerWidth);
-      } else {
-        // 如果要展开，恢复之前的宽度
-        const previousWidth = localStorage.getItem('previousDrawerWidth');
-        setDrawerWidth(previousWidth ? parseInt(previousWidth, 10) : defaultDrawerWidth);
-      }
-      return newState;
-    });
-  };
-
   const handleNavigate = useCallback((path) => {
     navigate(path);
-    if (isMobile) {
-      setMobileOpen(false);
-    }
-  }, [navigate, isMobile]);
-
-  // --- 抽屉内容 ---
-  const drawerContent = (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <Toolbar sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between',
-        minHeight: '64px' // 确保工具栏高度一致
-      }}>
-        <Typography variant="h6" noWrap component="div" sx={{ 
-          fontWeight: 'bold',
-          fontSize: sidebarCollapsed ? '0.8rem' : '1.25rem',
-          transition: 'font-size 0.2s'
-        }}>
-          {sidebarCollapsed ? 'T.B' : 'Tool.blog'}
-        </Typography>
-        <IconButton 
-          size="small" 
-          onClick={toggleSidebarCollapse}
-          sx={{ display: { xs: 'none', md: 'flex' } }}
-        >
-          {sidebarCollapsed ? <MenuIcon fontSize="small" /> : <DragHandleIcon fontSize="small" />}
-        </IconButton>
-      </Toolbar>
-      <Divider />
-      <Box sx={{ 
-        flexGrow: 1, 
-        overflowY: 'auto', 
-        overflowX: 'hidden',
-        '&::-webkit-scrollbar': {
-          width: '6px',
-        },
-        '&::-webkit-scrollbar-thumb': {
-          backgroundColor: 'rgba(0,0,0,0.2)',
-          borderRadius: '3px',
-        }
-      }}>
-        <CategorizedSidebar 
-          location={location} 
-          onNavigate={handleNavigate} 
-          collapsed={sidebarCollapsed}
-        />
-      </Box>
-    </Box>
-  );
+  }, [navigate]);
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default', color: 'text.primary' }}>
+      <CssBaseline />
       <Helmet>
         <title>{title}</title>
         <meta name="description" content={description} />
         <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </Helmet>
-      <CssBaseline />
-      
-      {/* 应用栏 */}
+
+      {/* 顶部导航 */}
       <AppBar
-        position="fixed"
+        position="sticky"
+        elevation={0}
         sx={{
-          width: { md: `calc(100% - ${drawerWidth}px)` },
-          ml: { md: `${drawerWidth}px` },
-          boxShadow: 2,
-          bgcolor: 'background.paper',
-          color: 'text.primary'
+          background: theme.palette.mode === 'dark'
+            ? 'linear-gradient(to right, #1e1e1e, #2c2c2c)'
+            : 'linear-gradient(to right, #ffffff, #f8f9fa)',
+          borderBottom: `1px solid ${theme.palette.divider}`
         }}
       >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { md: 'none' } }}
+        <Toolbar sx={{ px: { xs: 1, sm: 2 } }}>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 700,
+              color: 'primary.main',
+              mr: 2,
+              letterSpacing: 1.2,
+              fontSize: isMobile ? '1.1rem' : '1.25rem'
+            }}
           >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            {currentTool.name}
+            CDTools
           </Typography>
-          <IconButton onClick={toggleDarkMode} color="inherit">
-            {currentMode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
-          </IconButton>
+          <Box sx={{ flexGrow: 1 }} />
+          <Tooltip title={`Switch to ${currentMode === 'light' ? 'Dark' : 'Light'} mode`}>
+            <IconButton onClick={toggleDarkMode} color="inherit">
+              {currentMode === 'light' ? <Brightness4Icon /> : <Brightness7Icon />}
+            </IconButton>
+          </Tooltip>
         </Toolbar>
       </AppBar>
-      
-      {/* 移动端抽屉 */}
-      <Box
-        component="nav"
-        sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
-      >
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{ keepMounted: true }}
-          sx={{
-            display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': { 
-              boxSizing: 'border-box', 
-              width: drawerWidth,
-              borderRadius: 0
-            },
-          }}
-        >
-          {drawerContent}
-        </Drawer>
-        
-        {/* 桌面端抽屉 */}
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: 'none', md: 'block' },
-            '& .MuiDrawer-paper': { 
-              boxSizing: 'border-box', 
-              width: drawerWidth,
-              borderRight: '1px solid rgba(0, 0, 0, 0.12)',
-              transition: 'width 0.2s ease-in-out',
-              overflowX: 'hidden'
-            },
-          }}
-          open
-        >
-          {drawerContent}
-        </Drawer>
+
+      {/* 顶部广告位 */}
+      <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', mt: 1 }}>
+        <AdBanner slot={adConfig.header.slot} format="horizontal" responsive={true} />
       </Box>
-      
-      {/* 调整大小的手柄 */}
-      {!sidebarCollapsed && (
-        <Box
+
+      {/* 主内容区域 */}
+      <Box sx={{ 
+        display: 'flex', 
+        flexGrow: 1,
+        maxWidth: '100%',  // 修改为100%而不是固定的1920px
+        width: '100%',     // 添加宽度100%
+        mx: 'auto',
+        position: 'relative'
+      }}>
+        {/* 左侧广告 */}
+        {!isMobile && (
+          <Box 
+            sx={{ 
+              width: '160px', 
+              position: 'sticky',
+              top: '80px',
+              height: 'calc(100vh - 100px)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2
+            }}
+          >
+            <AdBanner slot={adConfig.sidebar.leftSidebar.slot} format="vertical" responsive={false} style={{ height: '600px' }} />
+          </Box>
+        )}
+        
+        {/* 中间内容区域 */}
+        <Container
+          maxWidth={false}
           sx={{
-            position: 'fixed',
-            top: 0,
-            left: drawerWidth - 3,
-            width: 6,
-            height: '100%',
-            cursor: 'col-resize',
-            zIndex: 1201,
-            display: { xs: 'none', md: 'block' }
-          }}
-          onMouseDown={startResizing}
-        />
-      )}
-      
-      {/* 主要内容 */}
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          width: { md: `calc(100% - ${drawerWidth}px)` },
-          transition: 'width 0.2s ease-in-out',
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: '100vh',
-          bgcolor: 'background.default'
-        }}
-      >
-        <Toolbar /> {/* 为应用栏腾出空间 */}
-        <Container 
-          maxWidth="lg" 
-          sx={{ 
-            flexGrow: 1, 
-            py: { xs: 2, sm: 3 },
+            flexGrow: 1,
+            py: { xs: 1, sm: 2, md: 3 },
             px: { xs: 1, sm: 2, md: 3 },
-            display: 'flex',
-            flexDirection: 'column'
+            maxWidth: '100%' // 确保容器可以占用全部可用宽度
           }}
         >
+          <Box sx={{ mb: isMobile ? 1 : 3 }}>
+            <TopNavigation location={location} onNavigate={handleNavigate} />
+          </Box>
+      
           <Outlet />
         </Container>
-        <Footer />
+        
+        {/* 右侧广告 */}
+        {!isMobile && (
+          <Box 
+            sx={{ 
+              width: '160px', 
+              position: 'sticky',
+              top: '80px',
+              height: 'calc(100vh - 100px)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2
+            }}
+          >
+            <AdBanner slot={adConfig.sidebar.rightSidebar.slot} format="vertical" responsive={false} style={{ height: '600px' }} />
+          </Box>
+        )}
       </Box>
+
+      {/* 底部广告位 */}
+      <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', mb: 1 }}>
+        <AdBanner slot={adConfig.footer.slot} format="horizontal" responsive={true} />
+      </Box>
+
+      {/* 页脚 */}
+      <Footer />
     </Box>
   );
 }

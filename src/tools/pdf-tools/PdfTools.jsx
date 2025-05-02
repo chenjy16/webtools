@@ -25,7 +25,7 @@ import MergeIcon from '@mui/icons-material/Merge';
 import ContentCutIcon from '@mui/icons-material/ContentCut';
 import DownloadIcon from '@mui/icons-material/Download';
 import { PDFDocument } from 'pdf-lib';
-import AdBanner from '../../components/AdBanner';
+
 
 // PDF Merger Component
 function PdfMerger() {
@@ -469,7 +469,7 @@ export default function PdfTools() {
         Powerful tools to merge multiple PDF files into one document or split a PDF into individual pages.
       </Typography>
 
-      <AdBanner slot="1122334455" />
+ 
 
       <Card sx={{ mt: 3 }}>
         <CardContent>

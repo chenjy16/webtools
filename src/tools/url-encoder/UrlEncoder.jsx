@@ -17,7 +17,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
-import AdBanner from '../../components/AdBanner'; // Assuming AdBanner component exists
+
 
 export default function UrlEncoder() {
   const [input, setInput] = useState('');
@@ -109,8 +109,8 @@ export default function UrlEncoder() {
         Online URL encoding and decoding, supports special characters and Unicode characters.
       </Typography>
 
-      {/* Ad above the tool */}
-      <AdBanner slot="8899001122" />
+      {/* 移除 AdBanner 组件 */}
+      {/* <AdBanner slot="8899001122" /> */}
 
       <Box sx={{ mb: 3 }}>
         <ToggleButtonGroup
@@ -227,8 +227,6 @@ export default function UrlEncoder() {
         </Grid>
       </Grid>
 
-      {/* Ad below the tool */}
-      <AdBanner slot="8899001122" />
 
       <Snackbar
         open={snackbarOpen}

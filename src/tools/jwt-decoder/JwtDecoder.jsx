@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AdBanner from '../../components/AdBanner';
+
 
 export default function JwtDecoder() {
   const [jwtToken, setJwtToken] = useState('');
@@ -101,8 +101,8 @@ export default function JwtDecoder() {
         Parse and validate JSON Web Tokens (JWT), view header and payload information.
       </Typography>
 
-      {/* Ad above the tool */}
-      <AdBanner slot="4455667788" />
+      {/* 移除 AdBanner 组件 */}
+      {/* <AdBanner slot="4455667788" /> */}
 
       <Card sx={{ mb: 4, boxShadow: 3 }}>
         <CardContent>
@@ -223,8 +223,7 @@ export default function JwtDecoder() {
         </CardContent>
       </Card>
 
-      {/* Ad below the tool */}
-      <AdBanner slot="4455667788" />
+
 
       <Snackbar
         open={snackbarOpen}

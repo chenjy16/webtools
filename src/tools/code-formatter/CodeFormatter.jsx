@@ -21,7 +21,6 @@ import {
 } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AdBanner from '../../components/AdBanner'; // Assuming this component exists
 import { js as beautifyJs, css as beautifyCss, html as beautifyHtml } from 'js-beautify';
 import CleanCSS from 'clean-css';
 // Import custom simple HTML minifier function
@@ -265,8 +264,6 @@ export default function CodeFormatter() {
         Beautify or minify your JavaScript, CSS, and HTML code.
       </Typography>
 
-      {/* Ad banner above the tool */}
-      {/* <AdBanner slot="YOUR_AD_SLOT_ID_1" /> */}
 
       <Card sx={{ mb: 4, boxShadow: 3 }}>
         <CardContent>

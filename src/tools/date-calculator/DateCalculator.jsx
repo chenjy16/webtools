@@ -19,13 +19,9 @@ import {
   Select,
   MenuItem
 } from '@mui/material';
-// Remove MUI date picker imports
-// import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-// import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-// import zhLocale from 'date-fns/locale/zh-CN';
+
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import AdBanner from '../../components/AdBanner';
+
 
 export default function DateCalculator() {
   const [activeTab, setActiveTab] = useState(0);
@@ -152,8 +148,8 @@ export default function DateCalculator() {
         Calculate the difference between two dates, or add/subtract time from a date.
       </Typography>
 
-      {/* Ad above the tool */}
-      <AdBanner slot="9900112233" />
+      {/* 移除 AdBanner 组件 */}
+      {/* <AdBanner slot="9900112233" /> */}
 
       <Card sx={{ mb: 4, boxShadow: 3 }}>
         <CardContent>
@@ -341,8 +337,7 @@ export default function DateCalculator() {
         </CardContent>
       </Card>
 
-      {/* Ad below the tool */}
-      <AdBanner slot="9900112233" />
+
 
       <Snackbar
         open={snackbarOpen}

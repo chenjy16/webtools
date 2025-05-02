@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import AdBanner from '../../components/AdBanner';
+
 import {
   Box,
   Button,
@@ -85,8 +85,6 @@ export default function PasswordGenerator() {
         Generate secure, random passwords with customizable length and character types.
       </Typography>
 
-      {/* Ad above the tool */}
-      <AdBanner slot="1122334455" />
 
       <Card sx={{ mb: 4 }}>
         <CardContent>
@@ -183,8 +181,8 @@ export default function PasswordGenerator() {
         </CardContent>
       </Card>
 
-      {/* Ad below the tool */}
-      <AdBanner slot="5544332211" />
+      {/* 移除 AdBanner 组件 */}
+      {/* <AdBanner slot="5544332211" /> */}
 
       <Typography variant="h6" gutterBottom>
         Password Security Tips

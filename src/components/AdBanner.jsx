@@ -1,69 +1,137 @@
-import { Box, Skeleton, Paper } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { shouldShowAd } from '../config/adConfig';
+import { useState, useEffect, useRef } from 'react';
+import { Box, Skeleton, useMediaQuery, useTheme } from '@mui/material';
 
-export default function AdBanner({ slot, format = 'auto', responsive = true, style = {} }) {
-  const [isLoaded, setIsLoaded] = useState(false);
-  // 添加您的新域名到允许的域名列表中
-  const allowedDomains = ['tool.blog'];
-  const isAllowedDomain = allowedDomains.includes(window.location.hostname);
-  const showAd = shouldShowAd() && isAllowedDomain;
-  
+const AdBanner = ({
+  slot,
+  format = 'horizontal',
+  responsive = true,
+  lazyLoad = true,
+  className = '',
+  style = {}
+}) => {
+  const [isLoaded, setIsLoaded] = useState(!lazyLoad);
+  const [hasError, setHasError] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const adContainerRef = useRef(null);
+  const adInsRef = useRef(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  // 根据设备类型自动调整广告格式
+  const effectiveFormat = isMobile && format === 'horizontal' ? 'rectangle' : format;
+
   useEffect(() => {
-    if (!showAd) return;
-    
-    // 设置超时，如果广告长时间未加载，也显示内容区域
-    const timeout = setTimeout(() => {
-      setIsLoaded(true);
-    }, 2000);
-    
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({
-        callback: () => {
-          setIsLoaded(true);
-          clearTimeout(timeout);
-        }
-      });
-    } catch (e) {
-      console.error('AdSense 广告加载失败:', e);
-      setIsLoaded(true);
-      clearTimeout(timeout);
+    if (!lazyLoad) {
+      setIsVisible(true);
+      return;
     }
-    
-    return () => clearTimeout(timeout);
-  }, [showAd]);
-  
-  if (!showAd) return null;
-  
+    // IntersectionObserver 懒加载
+    const observer = new window.IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1, rootMargin: '200px' }
+    );
+    if (adContainerRef.current) {
+      observer.observe(adContainerRef.current);
+    }
+    return () => {
+      if (adContainerRef.current) {
+        observer.unobserve(adContainerRef.current);
+      }
+      observer.disconnect();
+    };
+  }, [slot, lazyLoad]);
+
+  // 只在广告首次可见且未加载时 push
+  useEffect(() => {
+    if (isVisible && !isLoaded) {
+      setIsLoaded(true);
+      // 确保只 push 一次
+      setTimeout(() => {
+        try {
+          if (window.adsbygoogle && adInsRef.current) {
+            window.adsbygoogle.push({});
+          }
+        } catch (error) {
+          console.error('广告加载失败:', error);
+          setHasError(true);
+        }
+      }, 100);
+    }
+  }, [isVisible, isLoaded]);
+
+  // 广告加载失败时隐藏
+  const handleAdError = () => {
+    setHasError(true);
+    console.log(`广告加载失败: ${slot}`);
+  };
+
+  // 根据格式确定广告尺寸
+  const getAdSize = () => {
+    switch (effectiveFormat) {
+      case 'horizontal':
+        return { width: '100%', height: isMobile ? '90px' : '90px' };
+      case 'vertical':
+        return { width: isMobile ? '120px' : '160px', height: isMobile ? '400px' : '600px' };
+      case 'rectangle':
+        return { width: isMobile ? '250px' : '300px', height: isMobile ? '200px' : '250px' };
+      case 'adaptive':
+        return { width: '100%', height: 'auto', minHeight: isMobile ? '100px' : '150px' };
+      default:
+        return { width: '100%', height: 'auto' };
+    }
+  };
+
+  const adSize = getAdSize();
+
+  if (hasError) return null;
+
   return (
-    <Paper 
-      elevation={0}
-      sx={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        my: 2,
-        p: 1,
-        minHeight: isLoaded ? 'auto' : '100px',
-        border: '1px solid rgba(0, 0, 0, 0.08)',
-        borderRadius: 2,
-        bgcolor: 'rgba(0, 0, 0, 0.01)',
-        ...style 
+    <Box
+      ref={adContainerRef}
+      id={`ad-container-${slot}`}
+      className={`ad-container ${className}`}
+      sx={{
+        width: adSize.width,
+        height: adSize.height,
+        margin: '10px auto',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'hidden',
+        transition: 'all 0.3s ease',
+        ...style
       }}
-      className="ad-container"
     >
-      {!isLoaded && <Skeleton variant="rectangular" width="100%" height={100} animation="wave" />}
-      <ins
-        className="adsbygoogle"
-        style={{
-          display: isLoaded ? 'block' : 'none',
-          textAlign: 'center',
-          width: '100%',
-        }}
-        data-ad-client="ca-pub-5760733313637437"
-        data-ad-slot={slot}
-        data-ad-format={format}
-        data-full-width-responsive={responsive ? 'true' : 'false'}
-      ></ins>
-    </Paper>
+      {!isLoaded ? (
+        <Skeleton
+          variant="rectangular"
+          width={adSize.width}
+          height={adSize.height}
+          animation="wave"
+        />
+      ) : (
+        <ins
+          ref={adInsRef}
+          className="adsbygoogle"
+          style={{
+            display: 'block',
+            width: adSize.width,
+            height: adSize.height,
+          }}
+          data-ad-client="ca-pub-5760733313637437"
+          data-ad-slot={slot}
+          data-ad-format={effectiveFormat}
+          data-full-width-responsive={responsive ? 'true' : 'false'}
+          onError={handleAdError}
+        />
+      )}
+    </Box>
   );
-}
+};
+
+export default AdBanner;

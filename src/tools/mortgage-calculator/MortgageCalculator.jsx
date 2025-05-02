@@ -7,7 +7,7 @@ import {
   Grid,
   TextField,
   Typography,
-  Slider, // Keep Slider if you still want it as an alternative input
+  // Slider, // Slider removed for cleaner input via TextField primarily
   FormControl,
   InputLabel,
   Select,
@@ -21,9 +21,13 @@ import {
   Paper,
   Divider,
   InputAdornment,
-  Alert // For displaying notes/disclaimers
+  Alert,
+  Skeleton // Added for potential loading state
 } from '@mui/material';
-import AdBanner from '../../components/AdBanner'; // Assuming AdBanner component exists
+import CalculateIcon from '@mui/icons-material/Calculate'; // Example Icon
+import ShowChartIcon from '@mui/icons-material/ShowChart'; // For Amortization button
+import HideSourceIcon from '@mui/icons-material/HideSource'; // For Amortization button
+
 
 export default function MortgageCalculator() {
   // --- State Variables ---
@@ -40,6 +44,7 @@ export default function MortgageCalculator() {
   const [amortizationSchedule, setAmortizationSchedule] = useState([]);
   const [isUpdatingDownPayment, setIsUpdatingDownPayment] = useState(false);
   const [isUpdatingPercent, setIsUpdatingPercent] = useState(false);
+  const [loading, setLoading] = useState(false); // Added loading state
 
   // State-specific variables (US)
   const [selectedState, setSelectedState] = useState('CA'); // Default to California
@@ -48,7 +53,6 @@ export default function MortgageCalculator() {
   const [monthlyPITI, setMonthlyPITI] = useState(0); // Total monthly payment (Principal, Interest, Tax, Insurance)
 
   // --- US State Data (Approximate Average Rates) ---
-  // Source: Needs verification/update from reliable sources (e.g., Freddie Mac, Tax Foundation)
   const stateData = {
     'AL': { name: 'Alabama', avgRate: 4.42, propertyTaxRate: 0.41 },
     'AK': { name: 'Alaska', avgRate: 4.48, propertyTaxRate: 1.19 },
@@ -101,20 +105,19 @@ export default function MortgageCalculator() {
     'WI': { name: 'Wisconsin', avgRate: 4.44, propertyTaxRate: 1.85 },
     'WY': { name: 'Wyoming', avgRate: 4.45, propertyTaxRate: 0.61 },
     'DC': { name: 'District of Columbia', avgRate: 4.43, propertyTaxRate: 0.56 }
-    // Note: These rates are illustrative and may be outdated. Use real-time data sources for production.
   };
 
-  // --- Input Handlers ---
+  // --- Input Handlers (Optimized with useCallback) ---
 
-  const handleStateChange = (event) => {
+  const handleStateChange = useCallback((event) => {
     const stateCode = event.target.value;
     setSelectedState(stateCode);
-    // Optionally set the interest rate to the state average when state changes
-    setInterestRate(stateData[stateCode].avgRate);
-  };
+    setInterestRate(stateData[stateCode]?.avgRate || 4.5); // Fallback rate
+  }, []); // No dependency needed as stateData is constant here
 
   const handleHomePriceChange = useCallback((value) => {
     setHomePrice(value);
+    // Use functional state update for downPaymentPercent if needed, otherwise direct is fine
     const newDownPayment = Math.round((value * downPaymentPercent) / 100);
     setDownPayment(newDownPayment);
     setLoanAmount(value - newDownPayment);
@@ -125,13 +128,13 @@ export default function MortgageCalculator() {
     setIsUpdatingDownPayment(true);
     setDownPayment(value);
     const newPercent = homePrice > 0 ? (value / homePrice) * 100 : 0;
-    setDownPaymentPercent(parseFloat(newPercent.toFixed(2)));
+    setDownPaymentPercent(parseFloat(newPercent.toFixed(1))); // Limit decimal places
     setLoanAmount(homePrice - value);
     requestAnimationFrame(() => setIsUpdatingDownPayment(false));
   }, [homePrice, isUpdatingPercent]);
 
   const handleDownPaymentPercentChange = useCallback((percent) => {
-    if (isUpdatingDownPayment) return;
+    if (isUpdatingDownPayment || percent < 0 || percent > 100) return;
     setIsUpdatingPercent(true);
     setDownPaymentPercent(percent);
     const newDownPayment = Math.round((homePrice * percent) / 100);
@@ -142,69 +145,72 @@ export default function MortgageCalculator() {
 
   const handleLoanAmountChange = useCallback((value) => {
     if (value > homePrice) value = homePrice;
+    if (value < 0) value = 0;
     setLoanAmount(value);
     const newDownPayment = homePrice - value;
     setDownPayment(newDownPayment);
     const newPercent = homePrice > 0 ? (newDownPayment / homePrice) * 100 : 0;
-    setDownPaymentPercent(parseFloat(newPercent.toFixed(2)));
+    setDownPaymentPercent(parseFloat(newPercent.toFixed(1))); // Limit decimal places
   }, [homePrice]);
 
-  // --- Calculation Logic ---
+  // --- Calculation Logic (Memoized) ---
 
   const calculateMortgage = useCallback(() => {
-    const principal = loanAmount;
-    const annualRate = interestRate;
-    const termYears = loanTerm;
-    const currentHomePrice = homePrice; // Use current value for tax calculation
-    const stateCode = selectedState;
-    const annualInsurance = homeInsurance;
+    setLoading(true); // Start loading indicator
 
-    if (principal <= 0 || annualRate < 0 || termYears <= 0) {
-      setMonthlyPAndI(0);
-      setTotalPayment(0);
-      setTotalInterest(0);
-      setPropertyTax(0);
-      setMonthlyPITI(0);
-      setAmortizationSchedule([]);
-      return;
-    }
+    // Simulate calculation delay for UX feedback
+    setTimeout(() => {
+      const principal = loanAmount;
+      const annualRate = interestRate;
+      const termYears = loanTerm;
+      const currentHomePrice = homePrice;
+      const stateCode = selectedState;
+      const annualInsurance = homeInsurance;
 
-    const monthlyRate = annualRate / 100 / 12;
-    const numberOfPayments = termYears * 12;
+      if (principal <= 0 || annualRate < 0 || termYears <= 0 || currentHomePrice <= 0) {
+        setMonthlyPAndI(0);
+        setTotalPayment(0);
+        setTotalInterest(0);
+        setPropertyTax(0);
+        setMonthlyPITI(0);
+        setAmortizationSchedule([]);
+        setLoading(false);
+        return;
+      }
 
-    // Calculate Principal & Interest (P&I)
-    let monthlyPI = 0;
-    if (monthlyRate === 0) {
-      monthlyPI = principal / numberOfPayments;
-    } else {
-      monthlyPI = principal * (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
-    }
-    setMonthlyPAndI(monthlyPI);
+      const monthlyRate = annualRate / 100 / 12;
+      const numberOfPayments = termYears * 12;
 
-    const totalPaid = monthlyPI * numberOfPayments;
-    const totalInt = totalPaid - principal;
-    setTotalPayment(totalPaid);
-    setTotalInterest(totalInt > 0 ? totalInt : 0);
+      let monthlyPI = 0;
+      if (monthlyRate === 0) {
+        monthlyPI = principal / numberOfPayments;
+      } else {
+        monthlyPI = principal * (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
+      }
+      setMonthlyPAndI(monthlyPI);
 
-    // Calculate Property Tax (T)
-    const taxRate = stateData[stateCode]?.propertyTaxRate || 0; // Default to 0 if state not found
-    const annualTax = currentHomePrice * (taxRate / 100);
-    setPropertyTax(annualTax);
-    const monthlyTax = annualTax / 12;
+      const totalPaid = monthlyPI * numberOfPayments;
+      const totalInt = totalPaid - principal;
+      setTotalPayment(totalPaid);
+      setTotalInterest(totalInt > 0 ? totalInt : 0);
 
-    // Calculate Home Insurance (I)
-    const monthlyInsurance = annualInsurance / 12;
+      const taxRate = stateData[stateCode]?.propertyTaxRate || 0;
+      const annualTax = currentHomePrice * (taxRate / 100);
+      setPropertyTax(annualTax);
+      const monthlyTax = annualTax / 12;
 
-    // Calculate Total Monthly Payment (PITI)
-    setMonthlyPITI(monthlyPI + monthlyTax + monthlyInsurance);
+      const monthlyInsurance = annualInsurance / 12;
 
-    // Generate Amortization Schedule (based on P&I only)
-    generateAmortizationSchedule(principal, annualRate, termYears, monthlyPI);
+      setMonthlyPITI(monthlyPI + monthlyTax + monthlyInsurance);
 
-  }, [loanAmount, interestRate, loanTerm, homePrice, selectedState, homeInsurance]); // Include all dependencies
+      generateAmortizationSchedule(principal, annualRate, termYears, monthlyPI);
+      setLoading(false); // Stop loading indicator
+    }, 150); // Short delay
 
-  // Generate Amortization Schedule (Yearly Summary)
-  const generateAmortizationSchedule = (principal, annualRate, years, monthlyPayment) => {
+  }, [loanAmount, interestRate, loanTerm, homePrice, selectedState, homeInsurance]);
+
+  // Generate Amortization Schedule (Memoized - though less critical as it depends on calculateMortgage)
+  const generateAmortizationSchedule = useCallback((principal, annualRate, years, monthlyPayment) => {
     const monthlyRate = annualRate / 100 / 12;
     const numberOfPayments = years * 12;
     const schedule = [];
@@ -233,7 +239,7 @@ export default function MortgageCalculator() {
           payment: monthlyPayment * 12, // Annual P&I Payment
           principalPaid: yearlyPrincipal,
           interest: yearlyInterest,
-          totalInterest: cumulativeInterest, // Cumulative Interest (P&I only)
+          totalInterest: cumulativeInterest,
           balance: Math.max(0, balance)
         });
         yearlyPrincipal = 0;
@@ -241,7 +247,7 @@ export default function MortgageCalculator() {
       }
     }
     setAmortizationSchedule(schedule);
-  };
+  }, []); // No dependencies needed here, as inputs are passed directly
 
   // --- Formatting ---
   const formatCurrency = (value) => {
@@ -256,32 +262,32 @@ export default function MortgageCalculator() {
 
   // --- Effects ---
   useEffect(() => {
-    calculateMortgage(); // Recalculate whenever dependencies change
+    calculateMortgage();
   }, [calculateMortgage]);
 
   // --- Render ---
   return (
-    <Box sx={{ maxWidth: 1000, mx: 'auto', p: { xs: 1, sm: 2 } }}>
-      <Typography variant="h4" component="h1" gutterBottom align="center">
+    <Box sx={{ maxWidth: 1000, mx: 'auto', p: { xs: 1, sm: 2, md: 3 } }}>
+      <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ fontWeight: 'bold', mb: 1 }}>
         US Mortgage Calculator
       </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph align="center">
-        Estimate your monthly mortgage payment (including PITI) and total costs based on state averages.
+      <Typography variant="body1" color="text.secondary" paragraph align="center" sx={{ mb: 3 }}>
+        Estimate your monthly mortgage payment (PITI) and total costs based on state averages.
       </Typography>
 
-      <AdBanner slot="1122334455" /> {/* Placeholder Ad */}
+  
 
-      <Grid container spacing={3}>
+      <Grid container spacing={3} >
         {/* Input Section */}
-        <Grid item xs={12} md={6}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
+        <Grid item xs={12} md={5}> {/* Adjusted grid size */}
+          <Card elevation={2} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <CardContent sx={{ flexGrow: 1 }}>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'medium', mb: 2 }}>
                 Loan Details
               </Typography>
 
               {/* State Selector */}
-              <FormControl fullWidth margin="normal">
+              <FormControl fullWidth margin="normal" variant="outlined">
                 <InputLabel id="state-select-label">State</InputLabel>
                 <Select
                   labelId="state-select-label"
@@ -304,6 +310,7 @@ export default function MortgageCalculator() {
                 value={homePrice}
                 onChange={(e) => handleHomePriceChange(Math.max(0, Number(e.target.value) || 0))}
                 type="number"
+                variant="outlined"
                 InputProps={{
                   startAdornment: <InputAdornment position="start">$</InputAdornment>,
                 }}
@@ -311,7 +318,7 @@ export default function MortgageCalculator() {
               />
 
               {/* Down Payment Inputs */}
-              <Grid container spacing={2} sx={{ mt: 0.5 }}> {/* Reduced top margin */}
+              <Grid container spacing={2} sx={{ mt: 0.5 }}>
                 <Grid item xs={6}>
                   <TextField
                     fullWidth
@@ -319,6 +326,7 @@ export default function MortgageCalculator() {
                     value={downPayment}
                     onChange={(e) => handleDownPaymentChange(Math.max(0, Number(e.target.value) || 0))}
                     type="number"
+                    variant="outlined"
                     InputProps={{
                       startAdornment: <InputAdornment position="start">$</InputAdornment>,
                     }}
@@ -331,6 +339,7 @@ export default function MortgageCalculator() {
                     value={downPaymentPercent}
                     onChange={(e) => handleDownPaymentPercentChange(Math.max(0, Number(e.target.value) || 0))}
                     type="number"
+                    variant="outlined"
                     InputProps={{
                       endAdornment: <InputAdornment position="end">%</InputAdornment>,
                       step: "0.1"
@@ -339,27 +348,29 @@ export default function MortgageCalculator() {
                 </Grid>
               </Grid>
 
-              {/* Loan Amount (Derived but editable) */}
+              {/* Loan Amount */}
               <TextField
                 fullWidth
                 label="Loan Amount"
                 value={loanAmount}
                 onChange={(e) => handleLoanAmountChange(Math.max(0, Number(e.target.value) || 0))}
                 type="number"
+                variant="outlined"
                 InputProps={{
                   startAdornment: <InputAdornment position="start">$</InputAdornment>,
                 }}
                 margin="normal"
-                sx={{ backgroundColor: 'action.hover' }}
+                sx={{ backgroundColor: 'action.hover', borderRadius: 1 }} // Subtle background
               />
 
               {/* Interest Rate */}
               <TextField
                 fullWidth
-                label="Interest Rate"
+                label="Interest Rate (APR)"
                 value={interestRate}
                 onChange={(e) => setInterestRate(Math.max(0, Number(e.target.value) || 0))}
                 type="number"
+                variant="outlined"
                 InputProps={{
                   endAdornment: <InputAdornment position="end">%</InputAdornment>,
                   step: "0.01"
@@ -369,7 +380,7 @@ export default function MortgageCalculator() {
               />
 
               {/* Loan Term */}
-              <FormControl fullWidth margin="normal">
+              <FormControl fullWidth margin="normal" variant="outlined">
                 <InputLabel id="loan-term-label">Loan Term</InputLabel>
                 <Select
                   labelId="loan-term-label"
@@ -391,6 +402,7 @@ export default function MortgageCalculator() {
                 value={homeInsurance}
                 onChange={(e) => setHomeInsurance(Math.max(0, Number(e.target.value) || 0))}
                 type="number"
+                variant="outlined"
                 InputProps={{
                   startAdornment: <InputAdornment position="start">$</InputAdornment>,
                 }}
@@ -402,136 +414,138 @@ export default function MortgageCalculator() {
         </Grid>
 
         {/* Results Section */}
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Calculation Results
-              </Typography>
+        <Grid item xs={12} md={7}> {/* Adjusted grid size */}
+          {/* Wrap results in Paper for better visual separation */}
+          <Paper elevation={3} sx={{ p: {xs: 2, md: 3}, height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 'medium', mb: 2 }}>
+              Calculation Results
+            </Typography>
 
-              <Paper elevation={3} sx={{ p: 2, mb: 2 }}>
-                <Typography variant="subtitle1" gutterBottom>
-                  Monthly Payment Breakdown
-                </Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">
-                      Principal & Interest:
-                    </Typography>
-                    <Typography variant="h6">
-                      {formatCurrency(monthlyPAndI)}
-                    </Typography>
+            {/* Conditional Loading Skeletons or Results */}
+            {loading ? (
+              <>
+                <Skeleton variant="rectangular" height={100} sx={{ mb: 2 }} />
+                <Skeleton variant="rectangular" height={150} sx={{ mb: 2 }} />
+              </>
+            ) : (
+              <>
+                {/* PITI Breakdown Card-like Section */}
+                <Paper variant="outlined" sx={{ p: 2, mb: 2, bgcolor: 'primary.lighter', borderRadius: 2 }}>
+                  <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.dark' }}>
+                    Estimated Monthly Payment (PITI)
+                  </Typography>
+                   {/* Main Result Highlight */}
+                   <Typography variant="h3" color="primary" sx={{ fontWeight: 'bold', mb: 2, textAlign: 'center' }}>
+                     {formatCurrency(monthlyPITI)}
+                   </Typography>
+                  <Grid container spacing={1.5} justifyContent="center">
+                    <Grid item xs={6} sm={3} textAlign="center">
+                      <Typography variant="caption" color="text.secondary" display="block">
+                        Principal & Interest
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                        {formatCurrency(monthlyPAndI)}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6} sm={3} textAlign="center">
+                      <Typography variant="caption" color="text.secondary" display="block">
+                        Property Tax (Est.)
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                        {formatCurrency(propertyTax / 12)}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6} sm={3} textAlign="center">
+                      <Typography variant="caption" color="text.secondary" display="block">
+                        Home Insurance (Est.)
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                        {formatCurrency(homeInsurance / 12)}
+                      </Typography>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">
-                      Property Tax:
-                    </Typography>
-                    <Typography variant="h6">
-                      {formatCurrency(propertyTax / 12)}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">
-                      Home Insurance:
-                    </Typography>
-                    <Typography variant="h6">
-                      {formatCurrency(homeInsurance / 12)}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">
-                      Total Monthly Payment:
-                    </Typography>
-                    <Typography variant="h5" color="primary">
-                      {formatCurrency(monthlyPITI)}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Paper>
+                </Paper>
 
-              <Paper elevation={3} sx={{ p: 2, mb: 2 }}>
-                <Typography variant="subtitle1" gutterBottom>
-                  Loan Summary
-                </Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">
-                      Total Loan Amount:
-                    </Typography>
-                    <Typography variant="h6">
-                      {formatCurrency(loanAmount)}
-                    </Typography>
+                {/* Loan Summary Section */}
+                <Paper variant='outlined' sx={{ p: 2, mb: 2, borderRadius: 2 }}>
+                  <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'medium' }}>
+                    Loan Summary
+                  </Typography>
+                  <Grid container spacing={1.5}>
+                    <Grid item xs={6}>
+                      <Typography variant="body2" color="text.secondary">Total Loan Amount:</Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 'medium' }}>{formatCurrency(loanAmount)}</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="body2" color="text.secondary">Down Payment:</Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 'medium' }}>{formatCurrency(downPayment)} ({downPaymentPercent.toFixed(1)}%)</Typography>
+                    </Grid>
+                     <Grid item xs={6}>
+                       <Typography variant="body2" color="text.secondary">Total P&I Payments:</Typography>
+                       <Typography variant="body1" sx={{ fontWeight: 'medium' }}>{formatCurrency(totalPayment)}</Typography>
+                     </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="body2" color="text.secondary">Total Interest Paid:</Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 'medium', color: 'warning.dark' }}>{formatCurrency(totalInterest)}</Typography>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">
-                      Down Payment:
-                    </Typography>
-                    <Typography variant="h6">
-                      {formatCurrency(downPayment)} ({downPaymentPercent.toFixed(1)}%)
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">
-                      Total Interest Paid:
-                    </Typography>
-                    <Typography variant="h6">
-                      {formatCurrency(totalInterest)}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">
-                      Total Payments:
-                    </Typography>
-                    <Typography variant="h6">
-                      {formatCurrency(totalPayment)}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Paper>
+                </Paper>
 
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={() => setShowAmortization(!showAmortization)}
-                fullWidth
-                sx={{ mt: 1 }}
-              >
-                {showAmortization ? 'Hide Amortization Schedule' : 'Show Amortization Schedule'}
-              </Button>
+                {/* Amortization Section */}
+                <Button
+                  variant="text" // Use text button for less visual weight
+                  color="primary"
+                  onClick={() => setShowAmortization(!showAmortization)}
+                  fullWidth
+                  startIcon={showAmortization ? <HideSourceIcon /> : <ShowChartIcon />}
+                  sx={{ mt: 1, justifyContent: 'flex-start', textTransform: 'none' }}
+                >
+                  {showAmortization ? 'Hide Amortization Schedule' : 'Show Amortization Schedule'}
+                </Button>
 
-              {showAmortization && (
-                <TableContainer component={Paper} sx={{ mt: 2, maxHeight: 300, overflowY: 'auto' }}>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Year</TableCell>
-                        <TableCell align="right">Principal Paid</TableCell>
-                        <TableCell align="right">Interest Paid</TableCell>
-                        <TableCell align="right">Remaining Balance</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {amortizationSchedule.map((row) => (
-                        <TableRow key={row.year}>
-                          <TableCell component="th" scope="row">{row.year}</TableCell>
-                          <TableCell align="right">{formatCurrency(row.principalPaid)}</TableCell>
-                          <TableCell align="right">{formatCurrency(row.interest)}</TableCell>
-                          <TableCell align="right">{formatCurrency(row.balance)}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              )}
-            </CardContent>
-          </Card>
+                {showAmortization && (
+                  <Box sx={{ mt: 1, flexGrow: 1 /* Allow table to take space */ }}>
+                    <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 350, overflowY: 'auto' }}>
+                      <Table size="small" stickyHeader>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Year</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 'bold' }}>Principal Paid</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 'bold' }}>Interest Paid</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 'bold' }}>Ending Balance</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {amortizationSchedule.length === 0 ? (
+                             <TableRow>
+                                <TableCell colSpan={4} align="center">No schedule data available.</TableCell>
+                              </TableRow>
+                          ) : (
+                             amortizationSchedule.map((row) => (
+                              <TableRow key={row.year} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                <TableCell component="th" scope="row">{row.year}</TableCell>
+                                <TableCell align="right">{formatCurrency(row.principalPaid)}</TableCell>
+                                <TableCell align="right">{formatCurrency(row.interest)}</TableCell>
+                                <TableCell align="right">{formatCurrency(row.balance)}</TableCell>
+                              </TableRow>
+                            ))
+                          )}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Box>
+                )}
+              </>
+            )}
+          </Paper>
         </Grid>
       </Grid>
 
+      {/* Disclaimer */}
       <Box sx={{ mt: 4 }}>
-        <Alert severity="info">
-          <Typography variant="body2">
-            This calculator provides estimates based on the information you enter. Actual loan terms and rates may vary based on your credit score, loan type, and current market conditions.
+        <Alert severity="info" variant="outlined" sx={{ borderRadius: 2 }}>
+          <Typography variant="body2" sx={{ lineHeight: 1.6 }}>
+            <strong>Disclaimer:</strong> This calculator provides estimates based on the data entered and average state rates. Actual loan terms, interest rates (APR), property taxes, and insurance costs may vary significantly based on your credit profile, lender, specific property location, and current market conditions. This tool does not include potential costs like HOA fees or Private Mortgage Insurance (PMI). Always consult with a qualified financial advisor and mortgage lender for personalized advice.
           </Typography>
         </Alert>
       </Box>

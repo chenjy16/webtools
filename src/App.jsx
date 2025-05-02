@@ -1,10 +1,15 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, BrowserRouter, Navigate } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { Box, CircularProgress } from '@mui/material';
 import './App.css';
 import CurrencyConverter from './tools/currency-converter/CurrencyConverter';
 import PdfTools from './tools/pdf-tools/PdfTools';
+import LoadingFallback from './components/LoadingFallback'; // 添加这一行
+import VideoTools from './tools/video-tools/VideoTools';
+import TempMail from './tools/temp-mail/TempMail';
+import PublicHolidays from './tools/public-holidays/PublicHolidays';
+
 
 // 懒加载各个工具组件
 const PasswordGenerator = lazy(() => import('./tools/password-generator/PasswordGenerator'));
@@ -39,21 +44,26 @@ const FakeDataGenerator = lazy(() => import('./tools/fake-data-generator/FakeDat
 // 添加Cron生成器组件
 const CronGenerator = lazy(() => import('./tools/cron-generator/CronGenerator'));
 
-
-
-// 加载指示器
-const LoadingFallback = () => (
-  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-    <CircularProgress />
-  </Box>
-);
+// 添加游戏组件懒加载
+const SnakeGame = lazy(() => import('./tools/games/snake/SnakeGame'));
+const Game2048 = lazy(() => import('./tools/games/2048/Game2048'));
+const TetrisGame = lazy(() => import('./tools/games/tetris/TetrisGame'));
+// 添加跳一跳游戏组件
+const JumpGame = lazy(() => import('./tools/games/jump-game/JumpGame'));
+const StreamVideos=lazy(() => import('./tools/stream-videos/StreamVideos'));
 
 function App() {
+  const [mode, setMode] = useState('light');
+  
+  const toggleDarkMode = () => {
+    setMode(prevMode => prevMode === 'light' ? 'dark' : 'light');
+  };
+  
   return (
     <BrowserRouter>
-      <Suspense fallback={<LoadingFallback />}>
+      <Suspense fallback={<LoadingFallback />}> {/* 使用 LoadingFallback 组件 */}
         <Routes>
-          <Route path="/" element={<MainLayout />}>
+          <Route path="/" element={<MainLayout toggleDarkMode={toggleDarkMode} currentMode={mode} />}>
             <Route index element={<Navigate to="/password-generator" replace />} />
             <Route path="password-generator" element={<PasswordGenerator />} />
             <Route path="json-formatter" element={<JsonFormatter />} />
@@ -84,6 +94,16 @@ function App() {
             <Route path="image-compressor" element={<ImageCompressor />} />
             <Route path="pdf-tools" element={<PdfTools />} />
             <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="/video-tools" element={<VideoTools />} />
+            {/* 游戏路由 */}
+            <Route path="games/snake" element={<SnakeGame />} />
+            <Route path="games/2048" element={<Game2048 />} />
+            <Route path="games/tetris" element={<TetrisGame />} />
+            <Route path="games/jump" element={<JumpGame />} />
+            <Route path="/stream-videos" element={<StreamVideos />} />
+            <Route path="/temp-mail" element={<TempMail />} />
+            // 在路由配置中添加
+            <Route path="/public-holidays" element={<PublicHolidays />} />
           </Route>
         </Routes>
       </Suspense>

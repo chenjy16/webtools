@@ -1,50 +1,121 @@
-// 广告配置
+// 广告配置文件
 export const adConfig = {
-  // 是否启用广告
-  enabled: true,
-  
-  // 广告位ID配置
-  slots: {
-    header: '1234567890',     // 页面顶部
-    footer: '0987654321',     // 页面底部
-    sidebar: '2468013579',    // 侧边栏
-    inContent: '1357924680',  // 内容中间
-    tools: {
-      passwordGenerator: '1122334455',
-      jsonFormatter: '2233445566',
-      ipLookup: '3344556677',
-      // 新增工具的广告位
-      jwtDecoder: '4455667788',
-      dateCalculator: '5566778899',
-      regexTester: '6677889900',
-      timer: '7788990011',
-      codeFormatter: '8899001122',
-      unitConverter: '9900112233',
-      // 添加新工具的广告位
-      newTool: '0011223344',
-      countryInfo: '0022334455'
+  // 页面顶部广告
+  header: {
+    slot: '2745536073',
+    format: 'horizontal',
+    responsive: true
+  },
+  // 页面底部广告
+  footer: {
+    slot: '2745536073',
+    format: 'horizontal',
+    responsive: true
+  },
+  // 工具页面内嵌广告
+  inContent: {
+    slot: '9258973534',
+    format: 'rectangle',
+    responsive: true
+  },
+  // 侧边栏广告配置
+  sidebar: {
+    leftSidebar: {
+      slot: '3253877934',
+      format: 'vertical',
+      responsive: false
+    },
+    rightSidebar: {
+      slot: '6176147644',
+      format: 'vertical',
+      responsive: false
     }
   },
-  
-  // 广告展示策略
-  strategy: {
-    // 每个页面最多显示的广告数量
-    maxAdsPerPage: 3,
-    
-    // 是否在移动设备上显示广告
-    showOnMobile: true,
-    
-    // 广告刷新间隔（毫秒）
-    refreshInterval: 0, // 0表示不自动刷新
+  // 操作完成后显示的广告
+  postAction: {
+    slot: '2745536073',
+    format: 'horizontal',
+    responsive: true
+  },
+  // 移动端专用广告
+  mobile: {
+    banner: {
+      slot: '9258973534',
+      format: 'adaptive',
+      responsive: true
+    },
+    interstitial: {
+      slot: '9258973534',
+      format: 'rectangle',
+      responsive: true
+    }
   }
 };
 
-// 获取特定工具的广告位ID
-export function getToolAdSlot(toolName) {
-  return adConfig.slots.tools[toolName] || adConfig.slots.inContent;
-}
+// 根据工具类型返回适合的广告配置
+export const getToolAdConfig = (toolType) => {
+  // 可以根据工具类型返回不同的广告配置
+  const toolSpecificAds = {
+    'finance': {
+      slot: '9258973534', 
+      format: 'rectangle',
+      responsive: true
+    },
+    'converter': {
+      slot: '9258973534', 
+      format: 'rectangle',
+      responsive: true
+    },
+    'calculator': {
+      slot: '9258973534', 
+      format: 'rectangle',
+      responsive: true
+    },
+    'encoder': {
+      slot: '9258973534',
+      format: 'rectangle',
+      responsive: true
+    },
+    'generator': {
+      slot: '9258973534',
+      format: 'rectangle',
+      responsive: true
+    },
+    'game': {
+      slot: '9258973534',
+      format: 'rectangle',
+      responsive: true
+    }
+    // 可以添加更多工具类型的广告配置
+  };
+  
+  return toolSpecificAds[toolType] || adConfig.inContent;
+};
 
-// 检查是否应该显示广告
-export function shouldShowAd() {
-  return adConfig.enabled;
-}
+// 根据用户操作类型返回适合的广告配置
+export const getPostActionAdConfig = (actionType) => {
+  const actionSpecificAds = {
+    'conversion': {
+      slot: '9258973534',
+      format: 'rectangle',
+      responsive: true
+    },
+    'calculation': {
+      slot: '9258973534',
+      format: 'rectangle',
+      responsive: true
+    },
+    'generation': {
+      slot: '9258973534',
+      format: 'rectangle',
+      responsive: true
+    },
+    'gameOver': {
+      slot: '9258973534',
+      format: 'rectangle',
+      responsive: true
+    }
+  };
+  
+  return actionSpecificAds[actionType] || adConfig.postAction;
+};

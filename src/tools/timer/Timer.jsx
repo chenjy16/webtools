@@ -30,7 +30,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import AlarmIcon from '@mui/icons-material/Alarm';
 import TimerIcon from '@mui/icons-material/Timer';
 import FlagIcon from '@mui/icons-material/Flag';
-import AdBanner from '../../components/AdBanner';
+
 import { LinearProgress } from '@mui/material';
 
 export default function Timer() {
@@ -211,8 +211,7 @@ export default function Timer() {
         Countdown and stopwatch functions to help you keep accurate time.
       </Typography>
 
-      {/* Ad above the tool */}
-      <AdBanner slot="7788990011" />
+  
 
       <Card sx={{ mb: 4, boxShadow: 3 }}>
         <CardContent>
@@ -440,8 +439,7 @@ export default function Timer() {
         </CardContent>
       </Card>
 
-      {/* Ad below the tool */}
-      <AdBanner slot="7788990011" />
+
 
       <Snackbar
         open={snackbarOpen}

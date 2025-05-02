@@ -26,7 +26,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import DeleteIcon from '@mui/icons-material/Delete';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import CompareIcon from '@mui/icons-material/Compare';
-import AdBanner from '../../components/AdBanner';
+
 
 export default function ImageCompressor() {
   // File-related states
@@ -217,7 +217,7 @@ export default function ImageCompressor() {
         Compress image size, convert image format, adjust image dimensions, and improve website loading speed.
       </Typography>
       
-      <AdBanner slot="1122334455" />
+      
       
       <Grid container spacing={3} sx={{ mt: 1 }}>
         <Grid item xs={12} md={6}>
