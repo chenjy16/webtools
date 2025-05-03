@@ -9,7 +9,7 @@ import { adConfig } from '../config/adConfig'; // 导入广告配置
 // 工具分类
 const toolCategories = [
   {
-    name: 'Encoding & Formatting Tools',
+    name: 'Encoding & Formatting',
     tools: [
       { name: 'Base64 Converter', path: '/base64-converter' },
       { name: 'URL Encoder/Decoder', path: '/url-encoder' },
@@ -23,8 +23,24 @@ const toolCategories = [
       { name: 'Cron Generator', path: '/cron-generator' },
     ]
   },
+
+  // 在 toolCategories 数组中的 "Network & Finance Tools" 分类中添加网络延迟测试工具
   {
-    name: 'Media & Conversion Tools',
+    name: 'Network',
+    tools: [
+      { name: 'IP Lookup', path: '/ip-lookup' },
+      { name: 'DNS Lookup', path: '/dns-lookup' },
+      { name: 'Speed Test', path: '/speed-test' },
+      { name: 'Network Latency', path: '/network-latency' }, // 添加网络延迟测试工具
+      { name: 'Country Info', path: '/country-info' },
+      { name: 'Currency Converter', path: '/CurrencyConverter' },
+      { name: 'Mortgage Calculator', path: '/mortgage-calculator' },
+      { name: 'Temporary Email Generator', path: '/temp-mail' },
+    ]
+  },
+
+  {
+    name: 'Media',
     tools: [
       { name: 'QR Code Generator', path: '/qrcode-generator' },
       { name: 'Image Compressor', path: '/image-compressor' },
@@ -36,31 +52,19 @@ const toolCategories = [
     ]
   },
   {
-    name: 'Time & Date Tools',
+    name: 'Time & Date',
     tools: [
       { name: 'Date Calculator', path: '/date-calculator' },
       { name: 'Timer', path: '/timer' },
       { name: 'public holidays', path: '/public-holidays' },
     ]
   },
-  // 在 toolCategories 数组中的 "Network & Finance Tools" 分类中添加电台地图工具
-  {
-      name: 'Network & Finance Tools',
-      tools: [
-        { name: 'IP Lookup', path: '/ip-lookup' },
-        { name: 'Country Info', path: '/country-info' },
-        { name: 'Currency Converter', path: '/CurrencyConverter' },
-        { name: 'Mortgage Calculator', path: '/mortgage-calculator' },
-        { name: 'Temporary Email Generator', path: '/temp-mail' },
-      ]
-    },
+
   {
     name: 'Games',
     tools: [
       { name: 'Snake Game', path: '/games/snake' },
       { name: 'Tetris', path: '/games/tetris' },
-      { name: '2048', path: '/games/2048' },
-      { name: 'Jump Game', path: '/games/jump' },
     ]
   },
   {

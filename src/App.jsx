@@ -9,6 +9,11 @@ import LoadingFallback from './components/LoadingFallback'; // 添加这一行
 import VideoTools from './tools/video-tools/VideoTools';
 import TempMail from './tools/temp-mail/TempMail';
 import PublicHolidays from './tools/public-holidays/PublicHolidays';
+import DnsLookup from './tools/dns-lookup/DnsLookup'; 
+import SpeedTest from './tools/speed-test/SpeedTest';
+
+// 添加网络延迟测试工具组件导入
+const NetworkLatency = lazy(() => import('./tools/network-latency/NetworkLatency'));
 
 
 // 懒加载各个工具组件
@@ -46,11 +51,10 @@ const CronGenerator = lazy(() => import('./tools/cron-generator/CronGenerator'))
 
 // 添加游戏组件懒加载
 const SnakeGame = lazy(() => import('./tools/games/snake/SnakeGame'));
-const Game2048 = lazy(() => import('./tools/games/2048/Game2048'));
 const TetrisGame = lazy(() => import('./tools/games/tetris/TetrisGame'));
-// 添加跳一跳游戏组件
-const JumpGame = lazy(() => import('./tools/games/jump-game/JumpGame'));
 const StreamVideos=lazy(() => import('./tools/stream-videos/StreamVideos'));
+
+
 
 function App() {
   const [mode, setMode] = useState('light');
@@ -97,13 +101,16 @@ function App() {
             <Route path="/video-tools" element={<VideoTools />} />
             {/* 游戏路由 */}
             <Route path="games/snake" element={<SnakeGame />} />
-            <Route path="games/2048" element={<Game2048 />} />
             <Route path="games/tetris" element={<TetrisGame />} />
-            <Route path="games/jump" element={<JumpGame />} />
             <Route path="/stream-videos" element={<StreamVideos />} />
             <Route path="/temp-mail" element={<TempMail />} />
-            // 在路由配置中添加
             <Route path="/public-holidays" element={<PublicHolidays />} />
+            {/* 添加DNS查询工具路由 */}
+            <Route path="/dns-lookup" element={<DnsLookup />} />
+            {/* 添加网络速度测试路由 */}
+            <Route path="/speed-test" element={<SpeedTest />} />
+            {/* 添加网络延迟测试工具路由 */}
+            <Route path="/network-latency" element={<NetworkLatency />} />
           </Route>
         </Routes>
       </Suspense>

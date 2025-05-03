@@ -46,7 +46,6 @@ const toolData = [
   { name: 'PDF Tools', path: '/pdf-tools' },
   { name: 'Temporary Email Generator', path: '/temp-mail' },
   { name: 'Public Holidays', path: '/public-holidays' },
-  { name: 'Pomodoro Timer', path: '/pomodoro' } // 添加番茄钟工具
 ];
 
 const descriptions = {
@@ -59,7 +58,7 @@ const descriptions = {
   '/base64-converter': 'Convert between text and Base64 encoding, with file upload support.',
   '/hash-calculator': 'Calculate hash values for text or files, supporting multiple hash algorithms.',
   '/color-converter': 'Convert between color formats such as HEX, RGB, and HSL.',
-  '/ip-lookup': 'Query detailed information about IP addresses, including geolocation and ISP data.',
+  '/ip-lookup': '查询域名注册信息，包括域名注册人、注册日期、到期日期等详细信息。',
   '/jwt-decoder': 'Decode and verify JWT tokens to view the contained data.',
   '/date-calculator': 'Calculate date differences, add or subtract time units.',
   '/regex-tester': 'Test and validate regular expressions with real-time matching results.',
@@ -74,7 +73,10 @@ const descriptions = {
   '/image-compressor': 'Compress and convert images to reduce file size while maintaining quality.',
   '/pdf-tools': 'Merge multiple PDF files into one document or split a PDF into individual pages.',
   '/temp-mail': 'Create a temporary email address to receive emails and protect your privacy. Powered by the mail.tm API.',
-  '/public-holidays': 'Check public holiday information for countries and regions around the world. Supports multiple countries and regions.'
+  '/public-holidays': 'Check public holiday information for countries and regions around the world. Supports multiple countries and regions.',
+  '/dns-lookup': 'Query DNS records for domains, including A, AAAA, MX, TXT, NS, and other record types.',
+  '/speed-test': 'Test your internet connection speed, including download and upload speeds.',
+  '/ssl-checker': '检查网站的SSL证书信息，包括证书有效期、颁发机构、加密算法等。'
 };
 
 // --- Main Layout Component ---
