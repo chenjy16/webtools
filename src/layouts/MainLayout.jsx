@@ -76,7 +76,7 @@ const descriptions = {
   '/public-holidays': 'Check public holiday information for countries and regions around the world. Supports multiple countries and regions.',
   '/dns-lookup': 'Query DNS records for domains, including A, AAAA, MX, TXT, NS, and other record types.',
   '/speed-test': 'Test your internet connection speed, including download and upload speeds.',
-  '/ssl-checker': '检查网站的SSL证书信息，包括证书有效期、颁发机构、加密算法等。'
+  '/api-tester': '测试API接口的工具，支持多种HTTP方法、自定义请求头和参数，并可保存历史记录和收藏夹。',
 };
 
 // --- Main Layout Component ---

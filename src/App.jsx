@@ -11,6 +11,7 @@ import TempMail from './tools/temp-mail/TempMail';
 import PublicHolidays from './tools/public-holidays/PublicHolidays';
 import DnsLookup from './tools/dns-lookup/DnsLookup'; 
 import SpeedTest from './tools/speed-test/SpeedTest';
+import ApiTester from './tools/api-tester/ApiTester'; // 导入 ApiTester 组件
 
 // 添加网络延迟测试工具组件导入
 const NetworkLatency = lazy(() => import('./tools/network-latency/NetworkLatency'));
@@ -68,7 +69,7 @@ function App() {
       <Suspense fallback={<LoadingFallback />}> {/* 使用 LoadingFallback 组件 */}
         <Routes>
           <Route path="/" element={<MainLayout toggleDarkMode={toggleDarkMode} currentMode={mode} />}>
-            <Route index element={<Navigate to="/password-generator" replace />} />
+            <Route index element={<Navigate to="/temp-mail" replace />} />
             <Route path="password-generator" element={<PasswordGenerator />} />
             <Route path="json-formatter" element={<JsonFormatter />} />
             <Route path="hmac-calculator" element={<HmacCalculator />} />
@@ -111,6 +112,10 @@ function App() {
             <Route path="/speed-test" element={<SpeedTest />} />
             {/* 添加网络延迟测试工具路由 */}
             <Route path="/network-latency" element={<NetworkLatency />} />
+            {/* 添加API测试工具路由 */}
+            <Route path="/api-tester" element={<ApiTester />} />
+
+ 
           </Route>
         </Routes>
       </Suspense>

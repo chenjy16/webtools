@@ -76,11 +76,11 @@ export default function IpLookup() {
     setError('');
 
     try {
-      const response = await fetch(`https://ipapi.co/${ip}/json/`);
+      const response = await fetch(`https://ipwho.is/${ip}`);
       const data = await response.json();
 
-      if (data.error) {
-        throw new Error(data.reason || 'Query failed');
+      if (!data.success) {
+        throw new Error(data.message || 'Query failed');
       }
 
       setIpInfo(data);
@@ -221,7 +221,7 @@ export default function IpLookup() {
                         Location
                       </TableCell>
                       <TableCell>
-                        {ipInfo.city || 'Unknown'}, {ipInfo.region || 'Unknown'}, {ipInfo.country_name || 'Unknown'}
+                        {ipInfo.city || 'Unknown'}, {ipInfo.region || 'Unknown'}, {ipInfo.country || 'Unknown'}
                       </TableCell>
                     </TableRow>
 
@@ -229,14 +229,14 @@ export default function IpLookup() {
                       <TableCell component="th" scope="row" sx={{ fontWeight: 'bold' }}>
                         ISP
                       </TableCell>
-                      <TableCell>{ipInfo.org || 'Unknown'}</TableCell>
+                      <TableCell>{ipInfo.connection?.org || 'Unknown'}</TableCell>
                     </TableRow>
 
                     <TableRow>
                       <TableCell component="th" scope="row" sx={{ fontWeight: 'bold' }}>
                         Timezone
                       </TableCell>
-                      <TableCell>{ipInfo.timezone || 'Unknown'}</TableCell>
+                      <TableCell>{ipInfo.timezone?.id || 'Unknown'} ({ipInfo.timezone?.utc || 'Unknown'})</TableCell>
                     </TableRow>
 
                     <TableRow sx={{ '&:nth-of-type(odd)': { backgroundColor: 'rgba(0, 0, 0, 0.03)' } }}>
@@ -252,6 +252,32 @@ export default function IpLookup() {
                       </TableCell>
                       <TableCell>
                         {ipInfo.latitude || 'Unknown'}, {ipInfo.longitude || 'Unknown'}
+                      </TableCell>
+                    </TableRow>
+                    
+                    <TableRow sx={{ '&:nth-of-type(odd)': { backgroundColor: 'rgba(0, 0, 0, 0.03)' } }}>
+                      <TableCell component="th" scope="row" sx={{ fontWeight: 'bold' }}>
+                        Network Information
+                      </TableCell>
+                      <TableCell>
+                        ASN: {ipInfo.connection?.asn || 'Unknown'}<br />
+                        Domain: {ipInfo.connection?.domain || 'Unknown'}
+                      </TableCell>
+                    </TableRow>
+                    
+                    <TableRow>
+                      <TableCell component="th" scope="row" sx={{ fontWeight: 'bold' }}>
+                        Country Information
+                      </TableCell>
+                      <TableCell>
+                        Country Code: {ipInfo.country_code || 'Unknown'}<br />
+                        Capital: {ipInfo.capital || 'Unknown'}<br />
+                        {ipInfo.flag && (
+                          <Box sx={{ mt: 1, display: 'flex', alignItems: 'center' }}>
+                            <Typography variant="body2" sx={{ mr: 1 }}>Flag:</Typography>
+                            {ipInfo.flag.emoji} 
+                          </Box>
+                        )}
                       </TableCell>
                     </TableRow>
                   </TableBody>
@@ -275,7 +301,7 @@ export default function IpLookup() {
                 }}
               >
                 <Box sx={{ position: 'absolute', top: 5, right: 5, zIndex: 2 }}>
-                  <IconButton size="small" onClick={handleCloseAd} aria-label="关闭广告">
+                  <IconButton size="small" onClick={handleCloseAd} aria-label="Close Ad">
                     <CloseIcon fontSize="small" />
                   </IconButton>
                 </Box>

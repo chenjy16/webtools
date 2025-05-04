@@ -32,6 +32,7 @@ const toolCategories = [
       { name: 'DNS Lookup', path: '/dns-lookup' },
       { name: 'Speed Test', path: '/speed-test' },
       { name: 'Network Latency', path: '/network-latency' }, // 添加网络延迟测试工具
+      { name: 'API Tester', path: '/api-tester' }, // 添加API测试工具
       { name: 'Country Info', path: '/country-info' },
       { name: 'Currency Converter', path: '/CurrencyConverter' },
       { name: 'Mortgage Calculator', path: '/mortgage-calculator' },
