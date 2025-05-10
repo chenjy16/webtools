@@ -19,7 +19,8 @@ function SettingsDialog() {
     setUseDefaultKey,
     setApiKeyDialogOpen,
     setLivePreviewEnabled,
-    handleSaveApiKey
+    handleSaveApiKey,
+    handleProviderChange
   } = useWebsiteBuilder() || {};  // 添加默认空对象，防止解构 undefined
 
   // 修改这里，添加类型检查
@@ -52,15 +53,15 @@ function SettingsDialog() {
         <FormControl size="small" sx={{ minWidth: 200 }}>
           <InputLabel>AI Provider</InputLabel>
           <Select
-            value={provider || 'auto'}
+            value={provider || 'novita'}
             label="AI Provider"
-            onChange={(e) => typeof setProvider === 'function' && setProvider(e.target.value)}
+            onChange={handleProviderChange}
           >
-            <MenuItem value="auto">Auto Select</MenuItem>
+            <MenuItem value="novita">NovitaAI</MenuItem>
             <MenuItem value="fireworks-ai">Fireworks AI</MenuItem>
             <MenuItem value="nebius">Nebius AI Studio</MenuItem>
             <MenuItem value="sambanova">SambaNova</MenuItem>
-            <MenuItem value="novita">NovitaAI</MenuItem>
+            <MenuItem value="auto">Auto Select</MenuItem>
           </Select>
         </FormControl>
         <Button 

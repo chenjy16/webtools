@@ -30,7 +30,7 @@ export const WebsiteBuilderProvider = ({ children }) => {
       newsletter: false
     }
   });
-  
+
   // 聊天相关状态
   const [chatMessages, setChatMessages] = useState([
     { 
@@ -62,7 +62,7 @@ export const WebsiteBuilderProvider = ({ children }) => {
   const DEFAULT_API_KEY = import.meta.env.VITE_HUGGINGFACE_API_KEY || "";
   const [provider, setProvider] = useState('novita');
   const [apiKey, setApiKey] = useState('');
-  const [useDefaultKey, setUseDefaultKey] = useState(false);
+  const [useDefaultKey, setUseDefaultKey] = useState(true);
   const [apiKeyDialogOpen, setApiKeyDialogOpen] = useState(false);
   
   const chatEndRef = useRef(null);
