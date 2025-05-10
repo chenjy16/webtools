@@ -19,6 +19,7 @@ import {
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { adConfig } from '../config/adConfig';
+import { trackPageView, trackToolUsage } from '../utils/analytics';
 
 // --- Tool Data (for titles, descriptions, etc.) ---
 const toolData = [
@@ -87,7 +88,19 @@ export default function MainLayout({ toggleDarkMode, currentMode = 'light' }) {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // 添加currentTool变量定义
   const currentTool = toolData.find(t => t.path === location.pathname) || { name: 'Web Tools', path: '/' };
+
+  // 添加页面访问跟踪
+  useEffect(() => {
+    trackPageView(location.pathname, currentTool.name);
+    
+    // 如果不是首页，则跟踪工具使用
+    if (location.pathname !== '/') {
+      trackToolUsage(currentTool.name, 'view');
+    }
+  }, [location.pathname]);
+  
   const siteName = 'CDTools - Free Online Developer Utilities';
   const title = currentTool.path === '/' ? siteName : `${currentTool.name} | ${siteName}`;
   const description = descriptions[currentTool.path] || `A collection of free online web tools like ${currentTool.name ? currentTool.name + ', ' : ''}formatters, converters, and generators for developers and designers.`;
@@ -223,3 +236,5 @@ export default function MainLayout({ toggleDarkMode, currentMode = 'light' }) {
     </Box>
   );
 }
+
+

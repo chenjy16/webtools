@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Box, Skeleton, useMediaQuery, useTheme } from '@mui/material';
+import { trackAdImpression, trackAdClick } from '../utils/analytics';
 
 const AdBanner = ({
   slot,

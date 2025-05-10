@@ -12,6 +12,7 @@ import PublicHolidays from './tools/public-holidays/PublicHolidays';
 import DnsLookup from './tools/dns-lookup/DnsLookup'; 
 import SpeedTest from './tools/speed-test/SpeedTest';
 import ApiTester from './tools/api-tester/ApiTester'; // 导入 ApiTester 组件
+import WebsiteAnalyzer from './tools/website-analyzer/WebsiteAnalyzer';
 
 // 添加网络延迟测试工具组件导入
 const NetworkLatency = lazy(() => import('./tools/network-latency/NetworkLatency'));
@@ -54,7 +55,6 @@ const CronGenerator = lazy(() => import('./tools/cron-generator/CronGenerator'))
 const SnakeGame = lazy(() => import('./tools/games/snake/SnakeGame'));
 const TetrisGame = lazy(() => import('./tools/games/tetris/TetrisGame'));
 const StreamVideos=lazy(() => import('./tools/stream-videos/StreamVideos'));
-
 
 
 function App() {
@@ -114,8 +114,8 @@ function App() {
             <Route path="/network-latency" element={<NetworkLatency />} />
             {/* 添加API测试工具路由 */}
             <Route path="/api-tester" element={<ApiTester />} />
-
- 
+            {/* 新增 AI 网站分析工具路由 */}
+            <Route path="/website-analyzer" element={<WebsiteAnalyzer />} />
           </Route>
         </Routes>
       </Suspense>

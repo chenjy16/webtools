@@ -49,7 +49,7 @@ const toolCategories = [
       { name: 'Unit Converter', path: '/unit-converter' },
       { name: 'Color Converter', path: '/color-converter' },
       { name: 'Personal Information ', path: '/fake-data-generator' },
-
+      { name: 'AI Website Builder', path: '/website-analyzer' },
     ]
   },
   {
