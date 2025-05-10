@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, Typography, Paper, ToggleButtonGroup, ToggleButton, Tooltip } from '@mui/material';
+import { Box, Typography, Paper, ToggleButtonGroup, ToggleButton, Tooltip, IconButton, Snackbar, Alert } from '@mui/material';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { WebsiteBuilderProvider } from './context/WebsiteBuilderContext';
 import ChatInterface from './components/ChatInterface';
 import PreviewDialog from './components/PreviewDialog';
@@ -20,10 +21,35 @@ SyntaxHighlighter.registerLanguage('html', html);
 
 // Create code display component
 const CodeDisplay = () => {
-  const { generatedHtml, isStreaming, streamedHtml } = useWebsiteBuilder();
+  const { generatedHtml, isStreaming, streamedHtml, handleCopyHtml } = useWebsiteBuilder();
   
   // Use streaming response or final generated HTML
   const displayHtml = isStreaming ? streamedHtml : generatedHtml;
+  
+  // 添加复制成功提示状态
+  const [copySuccess, setCopySuccess] = useState(false);
+  
+  // 处理复制代码
+  const handleCopy = () => {
+    if (displayHtml) {
+      navigator.clipboard.writeText(displayHtml)
+        .then(() => {
+          setCopySuccess(true);
+          // 如果上下文中的handleCopyHtml可用，也调用它来保持一致性
+          if (typeof handleCopyHtml === 'function') {
+            handleCopyHtml();
+          }
+        })
+        .catch(err => {
+          console.error('复制失败:', err);
+        });
+    }
+  };
+  
+  // 处理关闭提示
+  const handleCloseAlert = () => {
+    setCopySuccess(false);
+  };
   
   // Add reference and auto-scroll effect
   const codeContainerRef = useRef(null);
@@ -55,6 +81,30 @@ const CodeDisplay = () => {
         <Typography variant="h6" component="h2">
           Code Generation
         </Typography>
+        
+        {/* 添加复制代码按钮 */}
+        <Tooltip title="复制代码" placement="top">
+          <IconButton 
+            aria-label="copy code" 
+            size="small" 
+            onClick={handleCopy}
+            disabled={!displayHtml || displayHtml === '<!-- Waiting for code generation... -->'}
+          >
+            <ContentCopyIcon />
+          </IconButton>
+        </Tooltip>
+        
+        {/* 复制成功提示 */}
+        <Snackbar 
+          open={copySuccess} 
+          autoHideDuration={3000} 
+          onClose={handleCloseAlert}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+          <Alert onClose={handleCloseAlert} severity="success" sx={{ width: '100%' }}>
+            代码已复制到剪贴板！
+          </Alert>
+        </Snackbar>
       </Paper>
       
       <Box 

@@ -18,24 +18,16 @@ addEventListener('fetch', event => {
 async function handleEvent(event, env) {
   const url = new URL(event.request.url)
   
-  // 首先检查是否是 API 请求
+  // 处理 API 请求
   if (url.pathname === '/api/analyze-website' && event.request.method === 'POST') {
     return handleAnalyzeWebsite(event.request, env)
   }
   
   // 特殊处理 Google 验证文件
-  if (url.pathname === '/ads.txt' || url.pathname.includes('google')) {
-    try {
-      // 尝试从KV存储获取验证文件
-      return await getAssetFromKV(event)
-    } catch (e) {
-      // 如果找不到验证文件，返回默认内容
-      if (url.pathname === '/ads.txt') {
-        return new Response('google.com, pub-5760733313637437, DIRECT, f08c47fec0942fa0', {
-          headers: { 'Content-Type': 'text/plain' }
-        })
-      }
-    }
+  if (url.pathname === '/ads.txt') {
+    return new Response('google.com, pub-5760733313637437, DIRECT, f08c47fec0942fa0', {
+      headers: { 'Content-Type': 'text/plain' }
+    })
   }
   
   try {
@@ -43,7 +35,6 @@ async function handleEvent(event, env) {
     return await getAssetFromKV(event)
   } catch (e) {
     // 如果资产不存在，检查是否是客户端路由
-    // 排除明显的静态资源路径
     const isStaticAsset = url.pathname.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/i);
     
     if (!isStaticAsset) {
@@ -53,17 +44,14 @@ async function handleEvent(event, env) {
           mapRequestToAsset: req => new Request(`${new URL(req.url).origin}/index.html`, req)
         });
         
-        // 设置缓存控制头，避免过度缓存
         const response = new Response(indexResponse.body, indexResponse);
         response.headers.set('Cache-Control', 'no-cache');
         return response;
       } catch (error) {
-        // 如果获取 index.html 失败，返回 404
         return new Response('Not Found', { status: 404 });
       }
     }
     
-    // 对于真正不存在的静态资源，返回 404
     return new Response('Not Found', { status: 404 });
   }
 }
@@ -90,11 +78,7 @@ async function handleAnalyzeWebsite(request, env) {
     }
     
     const html = await fetchResponse.text();
-    
-    // 简单的文本提取 (可以根据需要改进)
     const textContent = extractTextFromHtml(html);
-    
-    // 调用 Hugging Face API
     const analysisResult = await analyzeWithHuggingFace(textContent, url, env);
     
     return new Response(
@@ -111,23 +95,17 @@ async function handleAnalyzeWebsite(request, env) {
 
 // 从 HTML 中提取文本
 function extractTextFromHtml(html) {
-  // 移除 HTML 标签
   let text = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ');
   text = text.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ');
   text = text.replace(/<[^>]*>/g, ' ');
-  
-  // 移除多余空格
   text = text.replace(/\s+/g, ' ').trim();
-  
-  // 限制文本长度 (避免超过模型的最大输入长度)
   return text.substring(0, 10000);
 }
 
 // 使用 Hugging Face API 分析内容
 async function analyzeWithHuggingFace(textContent, url, env) {
-  const HF_API_KEY = env.VITE_HUGGINGFACE_API_KEY; // 从环境变量获取
+  const HF_API_KEY = env.VITE_HUGGINGFACE_API_KEY;
   
-  // 构建提示
   const prompt = `
 请分析以下网站内容，并提供：
 1. 网站的简短描述 (1-2 句话)
@@ -146,7 +124,6 @@ ${textContent}
 }
 `;
 
-  // 调用 Hugging Face API
   const response = await fetch(
     "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct",
     {
@@ -166,9 +143,7 @@ ${textContent}
 
   const result = await response.json();
   
-  // 解析 API 返回的结果
   try {
-    // 尝试从模型输出中提取 JSON
     const outputText = result[0].generated_text || result.generated_text;
     const jsonMatch = outputText.match(/\{[\s\S]*\}/);
     
@@ -181,7 +156,6 @@ ${textContent}
       };
     }
     
-    // 如果无法提取 JSON，返回原始文本
     return {
       description: "无法解析模型输出",
       keywords: ["无关键词"],
@@ -194,16 +168,5 @@ ${textContent}
       keywords: ["解析错误"],
       summary: "无法解析模型返回的结果。"
     };
-  }
-}
-
-// 更新路由处理
-async function handleRequest(request) {
-  const url = new URL(request.url);
-  const path = url.pathname;
-
-  // 处理 API 请求
-  if (path === '/api/analyze-website' && request.method === 'POST') {
-    return handleAnalyzeWebsite(request);
   }
 }
