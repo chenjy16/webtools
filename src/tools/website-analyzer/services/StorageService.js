@@ -6,7 +6,7 @@ export const saveApiKey = (apiKey) => {
     localStorage.setItem('website_builder_api_key', apiKey);
     return true;
   } catch (error) {
-    console.error('保存 API 密钥失败:', error);
+    console.error('Failed to save API key:', error);
     return false;
   }
 };
@@ -25,7 +25,7 @@ export const getCurrentApiKey = (defaultKey, useDefaultKey, userKey) => {
     const savedKey = localStorage.getItem('website_builder_api_key');
     return savedKey || '';
   } catch (error) {
-    console.error('获取 API 密钥失败:', error);
+    console.error('Failed to get API key:', error);
     return '';
   }
 };
@@ -40,7 +40,7 @@ export const checkApiKey = async (apiKey) => {
     // 为简化示例，这里只检查密钥长度是否合理
     return apiKey.length > 8;
   } catch (error) {
-    console.error('验证 API 密钥失败:', error);
+    console.error('Failed to verify API key:', error);
     return false;
   }
 };

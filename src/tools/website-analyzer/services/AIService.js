@@ -66,11 +66,11 @@ export const sendChatMessage = async (
     let response = chatCompletion.choices[0].message.content;
     return extractHtml(response); // 直接返回 AI 生成的 HTML
   } catch (error) {
-    console.error("AI API 调用失败:", error);
-    const errorMessage = error.message || "未知错误";
-    const statusCode = error.status || "无状态码";
-    console.error(`错误详情: 状态码 ${statusCode}, 消息: ${errorMessage}`);
-    throw new Error(`AI 生成失败: ${errorMessage}`);
+    console.error("AI API call failed:", error);
+    const errorMessage = error.message || "Unknown error";
+    const statusCode = error.status || "No status code";
+    console.error(`Error details: Status code ${statusCode}, Message: ${errorMessage}`);
+    throw new Error(`AI generation failed: ${errorMessage}`);
   }
 };
 
@@ -123,7 +123,7 @@ export const streamChatMessage = async (
     // 提取最终的 HTML
     return extractHtml(fullResponse);
   } catch (error) {
-    console.error("流式 AI API 调用失败:", error);
+    console.error("Streaming AI API call failed:", error);
     throw error;
   }
 };

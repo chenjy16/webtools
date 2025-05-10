@@ -41,7 +41,7 @@ const CodeDisplay = () => {
           }
         })
         .catch(err => {
-          console.error('复制失败:', err);
+          console.error('Copy failed:', err);
         });
     }
   };
@@ -102,7 +102,7 @@ const CodeDisplay = () => {
           anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         >
           <Alert onClose={handleCloseAlert} severity="success" sx={{ width: '100%' }}>
-            代码已复制到剪贴板！
+            Code copied to clipboard!
           </Alert>
         </Snackbar>
       </Paper>

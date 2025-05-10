@@ -76,7 +76,7 @@ export const WebsiteBuilderProvider = ({ children }) => {
       try {
         setSavedProjects(JSON.parse(savedProjectsData));
       } catch (error) {
-        console.error('加载保存的项目失败:', error);
+        console.error('Failed to load saved projects:', error);
       }
     }
   }, []);
@@ -227,7 +227,7 @@ export const WebsiteBuilderProvider = ({ children }) => {
         setPreviewOpen(true);
       }
     } catch (error) {
-      console.error("发送消息失败:", error);
+      console.error("Failed to send message:", error);
       // 添加错误消息到聊天
       setChatMessages([
         ...updatedMessages,
@@ -307,7 +307,7 @@ export const WebsiteBuilderProvider = ({ children }) => {
           setSnackbarOpen(true);
         })
         .catch(err => {
-          console.error('复制失败:', err);
+          console.error('Copy failed:', err);
           setSnackbarMessage('Copy failed, please copy manually');
           setSnackbarOpen(true);
         });
