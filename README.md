@@ -37,6 +37,7 @@ WebTools is a comprehensive collection of free online utilities designed to enha
 - Regex Tester : Test and validate regular expressions, view match results and capture groups.
 - Image Compressor : Compress and convert images to reduce file size while maintaining quality.
 - Fake Data Generator : Generate mock personal data for testing and development purposes.
+- Quickly build a static website through conversation. Tell the AI what you need, and it will generate HTML code with real-time preview.
 ## Financial & Reference Tools
 - Currency Converter : Real-time currency conversion supporting major global currencies.
 - Country Information Finder : Find country information, including population, currency, time zones, and more.

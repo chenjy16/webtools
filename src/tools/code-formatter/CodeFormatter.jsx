@@ -256,14 +256,13 @@ export default function CodeFormatter() {
   };
 
   return (
-    <Box sx={{ maxWidth: 900, mx: 'auto', p: { xs: 1, sm: 2 } }}> {/* Responsive padding */}
+    <Box sx={{ maxWidth: '100%', mx: 'auto', p: { xs: 1, sm: 2, md: 3 } }}>
       <Typography variant="h4" component="h1" gutterBottom align="center">
         Code Formatter Tool
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph align="center" sx={{ mb: 3 }}>
         Beautify or minify your JavaScript, CSS, and HTML code.
       </Typography>
-
 
       <Card sx={{ mb: 4, boxShadow: 3 }}>
         <CardContent>
@@ -272,16 +271,16 @@ export default function CodeFormatter() {
             onChange={handleTabChange}
             indicatorColor="primary"
             textColor="primary"
-            variant="fullWidth" // Makes tabs take full width
+            variant="fullWidth"
             sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}
           >
             <Tab label="Beautify Code" />
             <Tab label="Minify Code" />
           </Tabs>
 
-          <Grid container spacing={2}> {/* Reduced spacing */}
+          <Grid container spacing={2}>
             <Grid item xs={12}>
-              <FormControl fullWidth sx={{ mb: 2 }}> {/* Reduced margin */}
+              <FormControl fullWidth sx={{ mb: 2 }}>
                 <InputLabel id="format-type-label">Code Type</InputLabel>
                 <Select
                   labelId="format-type-label"
@@ -301,12 +300,12 @@ export default function CodeFormatter() {
                 fullWidth
                 label="Input Code"
                 multiline
-                rows={10} // Increased rows for better usability
+                rows={15}
                 value={inputCode}
                 onChange={handleInputChange}
                 placeholder={`Please enter your ${formatType.toUpperCase()} code here...`}
-                variant="outlined" // Standard outlined variant
-                InputProps={{ sx: { fontFamily: 'monospace', fontSize: '0.9rem' } }} // Monospace font
+                variant="outlined"
+                InputProps={{ sx: { fontFamily: 'monospace', fontSize: '0.9rem' } }}
               />
             </Grid>
 

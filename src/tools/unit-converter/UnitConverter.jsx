@@ -280,15 +280,13 @@ export default function UnitConverter() {
   };
 
   return (
-    <Box sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
+    <Box sx={{ maxWidth: '100%', mx: 'auto', p: { xs: 1, sm: 2, md: 3 } }}>
       <Typography variant="h4" component="h1" gutterBottom>
         Unit Converter Tool
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
         Perform fast and accurate conversions between different units.
       </Typography>
-
-
 
       <Card sx={{ mb: 4, boxShadow: 3 }}>
         <CardContent>
@@ -393,8 +391,6 @@ export default function UnitConverter() {
           )}
         </CardContent>
       </Card>
-
- 
 
       <Snackbar
         open={snackbarOpen}

@@ -209,15 +209,13 @@ export default function ImageCompressor() {
   };
   
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto', p: 2 }}>
+    <Box sx={{ maxWidth: '100%', mx: 'auto', p: { xs: 1, sm: 2, md: 3 } }}>
       <Typography variant="h4" component="h1" gutterBottom>
         Image Compression and Format Conversion
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
         Compress image size, convert image format, adjust image dimensions, and improve website loading speed.
       </Typography>
-      
-      
       
       <Grid container spacing={3} sx={{ mt: 1 }}>
         <Grid item xs={12} md={6}>

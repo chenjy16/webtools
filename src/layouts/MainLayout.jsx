@@ -169,8 +169,8 @@ export default function MainLayout({ toggleDarkMode, currentMode = 'light' }) {
       <Box sx={{ 
         display: 'flex', 
         flexGrow: 1,
-        maxWidth: '100%',  // 修改为100%而不是固定的1920px
-        width: '100%',     // 添加宽度100%
+        maxWidth: '100%',
+        width: '100%',
         mx: 'auto',
         position: 'relative'
       }}>
@@ -178,7 +178,7 @@ export default function MainLayout({ toggleDarkMode, currentMode = 'light' }) {
         {!isMobile && (
           <Box 
             sx={{ 
-              width: '160px', 
+              width: '200px', 
               position: 'sticky',
               top: '80px',
               height: 'calc(100vh - 100px)',
@@ -198,7 +198,7 @@ export default function MainLayout({ toggleDarkMode, currentMode = 'light' }) {
             flexGrow: 1,
             py: { xs: 1, sm: 2, md: 3 },
             px: { xs: 1, sm: 2, md: 3 },
-            maxWidth: '100%' // 确保容器可以占用全部可用宽度
+            maxWidth: '100%'
           }}
         >
           <Box sx={{ mb: isMobile ? 1 : 3 }}>
@@ -212,7 +212,7 @@ export default function MainLayout({ toggleDarkMode, currentMode = 'light' }) {
         {!isMobile && (
           <Box 
             sx={{ 
-              width: '160px', 
+              width: '200px', 
               position: 'sticky',
               top: '80px',
               height: 'calc(100vh - 100px)',

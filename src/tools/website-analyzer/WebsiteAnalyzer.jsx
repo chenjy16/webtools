@@ -199,9 +199,17 @@ const WebsiteContent = () => {
       width: '100%', 
       maxWidth: '100%', 
       mx: 'auto', 
-      p: { xs: 1, sm: 2 },
+      p: { xs: 1, sm: 2, md: 3 },
       boxSizing: 'border-box'
     }}>
+      {/* API Key 提示信息 */}
+      <Box sx={{ mb: 2, p: 2, bgcolor: '#fffbe6', border: '1px solid #ffe58f', borderRadius: 2 }}>
+        <Typography variant="body1" sx={{ color: '#ad8b00', fontWeight: 500 }}>
+          ⚠️ Notice: The default API Key has a usage limit. For more requests and better privacy, you can use your own Hugging Face API Key. <br />
+          Please enter your Hugging Face API Key in the settings. <br />
+          <span style={{fontSize: '0.95em', color: '#8c8c8c'}}>Get your key at <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer">https://huggingface.co/settings/tokens</a></span>
+        </Typography>
+      </Box>
       <Typography variant="h4" gutterBottom>
         AI Website Builder
       </Typography>
@@ -225,7 +233,7 @@ const WebsiteContent = () => {
       }}>
         {/* Left column - Adjust to responsive width */}
         <Box sx={{ 
-          width: { xs: '100%', md: '60%' }, 
+          width: { xs: '100%', md: '50%' }, 
           height: { xs: 'auto', md: '100%' },
           display: 'flex',
           flexDirection: 'column',
@@ -254,7 +262,7 @@ const WebsiteContent = () => {
         
         {/* Right column - Adjust to responsive width */}
         <Box sx={{ 
-          width: { xs: '100%', md: '40%' }, 
+          width: { xs: '100%', md: '50%' }, 
           height: { xs: '500px', md: '100%' },
           border: '1px solid rgba(0, 0, 0, 0.12)',
           borderRadius: 1,

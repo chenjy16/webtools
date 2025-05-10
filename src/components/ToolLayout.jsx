@@ -50,10 +50,10 @@ const ToolLayout = ({
   
   return (
     <Box sx={{ 
-      maxWidth: '100%',  // 确保使用100%宽度
-      width: '100%',     // 添加宽度100%
+      maxWidth: '100%',
+      width: '100%',
       mx: 'auto', 
-      p: { xs: 1, sm: 2 } 
+      p: { xs: 1, sm: 2, md: 3 } 
     }}>
       {/* 工具标题和描述 */}
       <Typography variant="h4" component="h1" gutterBottom>

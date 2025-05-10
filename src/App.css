@@ -1,5 +1,5 @@
 #root {
-  max-width: 1280px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
@@ -42,6 +42,18 @@
 }
 
 /* 全局响应式样式 */
+@media (min-width: 1200px) {
+  .MuiContainer-root {
+    max-width: 1600px !important;
+  }
+}
+
+@media (min-width: 1920px) {
+  .MuiContainer-root {
+    max-width: 1800px !important;
+  }
+}
+
 @media (max-width: 600px) {
   /* 调整小屏幕上的文本大小 */
   h1, .MuiTypography-h4 {
