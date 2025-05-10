@@ -69,7 +69,7 @@ function App() {
       <Suspense fallback={<LoadingFallback />}> {/* 使用 LoadingFallback 组件 */}
         <Routes>
           <Route path="/" element={<MainLayout toggleDarkMode={toggleDarkMode} currentMode={mode} />}>
-            <Route index element={<Navigate to="/temp-mail" replace />} />
+            <Route index element={<Navigate to="/website-analyzer" replace />} />
             <Route path="password-generator" element={<PasswordGenerator />} />
             <Route path="json-formatter" element={<JsonFormatter />} />
             <Route path="hmac-calculator" element={<HmacCalculator />} />
