@@ -87,24 +87,26 @@ function SettingsDialog() {
             label="Use Default API Key"
             sx={{ mb: 2, display: 'block' }}
           />
-          {!useDefaultKey && (
-            <TextField
-              autoFocus
-              margin="dense"
-              label="Hugging Face API Key"
-              type="password"
-              fullWidth
-              variant="outlined"
-              value={apiKey || ''}
-              onChange={(e) => typeof setApiKey === 'function' && setApiKey(e.target.value)}
-              disabled={!!useDefaultKey}
-              helperText="Please enter your Hugging Face API Key"
-            />
-          )}
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Hugging Face API Key"
+            type="password"
+            fullWidth
+            variant="outlined"
+            value={apiKey} // 修改：直接使用 apiKey，因为它总是字符串
+            onChange={(e) => {
+              if (typeof setApiKey === 'function') {
+                setApiKey(e.target.value);
+              }
+            }}
+            disabled={!!useDefaultKey}
+            helperText="Please enter your Hugging Face API Key"
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={closeApiKeyDialog}>Cancel</Button>
-          <Button onClick={onSaveClick} disabled={!useDefaultKey && !(apiKey || '').trim()}>
+          <Button onClick={onSaveClick} disabled={!useDefaultKey && !apiKey.trim()}> 
             Save
           </Button>
         </DialogActions>

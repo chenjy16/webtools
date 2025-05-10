@@ -59,7 +59,9 @@ export const WebsiteBuilderProvider = ({ children }) => {
   const [projectDialogOpen, setProjectDialogOpen] = useState(false);
   
   // API 相关状态
-  const DEFAULT_API_KEY = import.meta.env.VITE_HUGGINGFACE_API_KEY || "";
+  const DEFAULT_API_KEY = typeof import.meta !== 'undefined' && import.meta.env ? 
+    import.meta.env.VITE_HUGGINGFACE_API_KEY || "" : 
+    window.ENV_VITE_HUGGINGFACE_API_KEY || "";
   const [provider, setProvider] = useState('novita');
   const [apiKey, setApiKey] = useState('');
   const [useDefaultKey, setUseDefaultKey] = useState(true);

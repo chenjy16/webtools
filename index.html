@@ -33,7 +33,10 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5760733313637437"
      crossorigin="anonymous"></script>
 
-    
+    <script>
+      // 为客户端 JavaScript 提供环境变量
+      window.ENV_VITE_HUGGINGFACE_API_KEY = '<%=process.env.VITE_HUGGINGFACE_API_KEY%>';
+    </script>
   </head>
   <body>
     <div id="root"></div>

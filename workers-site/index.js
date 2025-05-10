@@ -5,7 +5,7 @@ import { getAssetFromKV } from '@cloudflare/kv-asset-handler'
  */
 addEventListener('fetch', event => {
   try {
-    event.respondWith(handleEvent(event))
+    event.respondWith(handleEvent(event, event.env))
   } catch (e) {
     event.respondWith(new Response('Internal Error', { status: 500 }))
   }
@@ -15,12 +15,12 @@ addEventListener('fetch', event => {
  * 从KV存储中获取静态资产并响应
  * @param {FetchEvent} event
  */
-async function handleEvent(event) {
+async function handleEvent(event, env) {
   const url = new URL(event.request.url)
   
   // 首先检查是否是 API 请求
   if (url.pathname === '/api/analyze-website' && event.request.method === 'POST') {
-    return handleAnalyzeWebsite(event.request)
+    return handleAnalyzeWebsite(event.request, env)
   }
   
   // 特殊处理 Google 验证文件
@@ -69,7 +69,7 @@ async function handleEvent(event) {
 }
 
 // 处理网站分析请求
-async function handleAnalyzeWebsite(request) {
+async function handleAnalyzeWebsite(request, env) {
   try {
     const { url } = await request.json();
     
@@ -95,7 +95,7 @@ async function handleAnalyzeWebsite(request) {
     const textContent = extractTextFromHtml(html);
     
     // 调用 Hugging Face API
-    const analysisResult = await analyzeWithHuggingFace(textContent, url);
+    const analysisResult = await analyzeWithHuggingFace(textContent, url, env);
     
     return new Response(
       JSON.stringify(analysisResult),
@@ -124,8 +124,8 @@ function extractTextFromHtml(html) {
 }
 
 // 使用 Hugging Face API 分析内容
-async function analyzeWithHuggingFace(textContent, url) {
-  const HF_API_KEY = HUGGINGFACE_API_KEY; // 从环境变量获取
+async function analyzeWithHuggingFace(textContent, url, env) {
+  const HF_API_KEY = env.VITE_HUGGINGFACE_API_KEY; // 从环境变量获取
   
   // 构建提示
   const prompt = `
