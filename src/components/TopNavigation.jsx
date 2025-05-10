@@ -9,7 +9,24 @@ import { adConfig } from '../config/adConfig'; // 导入广告配置
 // 工具分类
 const toolCategories = [
   {
-    name: 'Encoding & Formatting',
+    name: 'Utilities',
+    tools: [
+      { name: 'Temporary Email Generator 🔥', path: '/temp-mail' },
+      { name: 'QR Code Generator', path: '/qrcode-generator' },
+      { name: 'Image Compressor 🔥', path: '/image-compressor' },
+      { name: 'PDF Tools 🔥', path: '/pdf-tools' },
+      { name: 'Unit Converter ', path: '/unit-converter' },
+      { name: 'Color Converter ', path: '/color-converter' },
+      { name: 'Date Calculator ', path: '/date-calculator' },
+      { name: 'Timer ', path: '/timer' },
+      { name: 'public holidays', path: '/public-holidays' },
+      { name: 'Country Info', path: '/country-info' },
+      { name: 'Currency Converter', path: '/CurrencyConverter' },
+      { name: 'Mortgage Calculator', path: '/mortgage-calculator' },
+    ]
+  },
+  {
+    name: 'Developer Tools',
     tools: [
       { name: 'Base64 Converter', path: '/base64-converter' },
       { name: 'URL Encoder/Decoder', path: '/url-encoder' },
@@ -21,43 +38,25 @@ const toolCategories = [
       { name: 'Regex Tester', path: '/regex-tester' },
       { name: 'Password Generator', path: '/password-generator' },
       { name: 'Cron Generator', path: '/cron-generator' },
+      { name: 'API Tester', path: '/api-tester' }, // 添加API测试工具
     ]
   },
-
   // 在 toolCategories 数组中的 "Network & Finance Tools" 分类中添加网络延迟测试工具
   {
     name: 'Network',
     tools: [
-      { name: 'IP Lookup', path: '/ip-lookup' },
-      { name: 'DNS Lookup', path: '/dns-lookup' },
-      { name: 'Speed Test', path: '/speed-test' },
-      { name: 'Network Latency', path: '/network-latency' }, // 添加网络延迟测试工具
-      { name: 'API Tester', path: '/api-tester' }, // 添加API测试工具
-      { name: 'Country Info', path: '/country-info' },
-      { name: 'Currency Converter', path: '/CurrencyConverter' },
-      { name: 'Mortgage Calculator', path: '/mortgage-calculator' },
-      { name: 'Temporary Email Generator', path: '/temp-mail' },
-    ]
-  },
+      { name: 'IP Lookup 🔥', path: '/ip-lookup' },
+      { name: 'DNS Lookup 🔥', path: '/dns-lookup' },
+      { name: 'Speed Test 🔥', path: '/speed-test' },
+      { name: 'Network Latency 🔥', path: '/network-latency' }, // 添加网络延迟测试工具
 
-  {
-    name: 'Media',
-    tools: [
-      { name: 'QR Code Generator', path: '/qrcode-generator' },
-      { name: 'Image Compressor', path: '/image-compressor' },
-      { name: 'PDF Tools', path: '/pdf-tools' },
-      { name: 'Unit Converter', path: '/unit-converter' },
-      { name: 'Color Converter', path: '/color-converter' },
-      { name: 'Personal Information ', path: '/fake-data-generator' },
-      { name: 'AI Website Builder', path: '/website-analyzer' },
     ]
   },
   {
-    name: 'Time & Date',
+    name: 'AI Tools',
     tools: [
-      { name: 'Date Calculator', path: '/date-calculator' },
-      { name: 'Timer', path: '/timer' },
-      { name: 'public holidays', path: '/public-holidays' },
+      { name: 'AI Website Builder 🔥', path: '/website-analyzer' },
+      { name: 'AI Information Generator 🔥', path: '/fake-data-generator' },
     ]
   },
 
@@ -69,7 +68,7 @@ const toolCategories = [
     ]
   },
   {
-    name: 'Website Navigation',
+    name: 'Navigation',
     tools: [
       { name: 'Stream Videos', path: '/stream-videos' }, // 添加Stream Videos选项
       { name: 'Video Tools', path: '/video-tools' }, // 添加Video Tools选项
