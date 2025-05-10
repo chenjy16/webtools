@@ -59,7 +59,9 @@ export const WebsiteBuilderProvider = ({ children }) => {
   const [projectDialogOpen, setProjectDialogOpen] = useState(false);
   
   // API 相关状态 - 增强环境变量获取逻辑
-  // 按优先级顺序尝试不同的环境变量来源
+  const [defaultApiKey, setDefaultApiKey] = useState(""); // 初始化为空字符串
+
+  // 使用函数来获取环境变量，按优先级顺序尝试不同的来源
   const getDefaultApiKey = () => {
     // 1. 首先检查window上是否有Cloudflare Workers注入的环境变量
     if (typeof window !== 'undefined' && window.ENV_VITE_HUGGINGFACE_API_KEY) {
@@ -67,13 +69,13 @@ export const WebsiteBuilderProvider = ({ children }) => {
       return window.ENV_VITE_HUGGINGFACE_API_KEY;
     }
     
-    // 2. 尝试从Vite环境变量获取
+    // 2. 尝试从从vite环境变量获取
     if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_HUGGINGFACE_API_KEY) {
       console.log('Using API key from Vite environment');
       return import.meta.env.VITE_HUGGINGFACE_API_KEY;
     }
     
-    // 3. 从localStorage尝试获取之前保存的值
+    // 3. 从本地存储尝试获取之前保存的值
     try {
       const savedKey = localStorage.getItem('huggingface_api_key');
       if (savedKey) {
@@ -88,7 +90,62 @@ export const WebsiteBuilderProvider = ({ children }) => {
     return "";
   };
   
-  const DEFAULT_API_KEY = getDefaultApiKey();
+  // 在组件挂载时获取一次API Key
+  useEffect(() => {
+    // 立即打印调试信息，检查各种环境变量来源
+    console.log('【环境变量调试】');
+    console.log('window对象上的环境变量:', typeof window !== 'undefined' ? window.ENV_VITE_HUGGINGFACE_API_KEY : 'window未定义');
+    console.log('Vite环境变量:', typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_HUGGINGFACE_API_KEY : 'import.meta未定义');
+    
+    try {
+      console.log('localStorage中的API Key:', localStorage.getItem('huggingface_api_key'));
+    } catch (e) {
+      console.log('无法访问localStorage');
+    }
+    
+    // 首次获取API Key
+    const initialApiKey = getDefaultApiKey();
+    console.log('初始获取的API Key:', initialApiKey || '未获取到');
+    setDefaultApiKey(initialApiKey);
+
+    // 添加事件监听器来检测环境变量注入
+    const handleEnvVarsInjected = (event) => {
+      console.log('【环境变量注入事件被触发】', event.detail);
+      
+      // 再次检查window上的环境变量
+      if (typeof window !== 'undefined') {
+        console.log('事件触发后window上的环境变量:', window.ENV_VITE_HUGGINGFACE_API_KEY || '未设置');
+        
+        if (window.ENV_VITE_HUGGINGFACE_API_KEY) {
+          console.log('从注入的环境变量更新API key');
+          setDefaultApiKey(window.ENV_VITE_HUGGINGFACE_API_KEY);
+          // 更新后，再次打印状态以确认
+          setTimeout(() => {
+            console.log('更新后的defaultApiKey状态:', defaultApiKey);
+          }, 100);
+        }
+      }
+    };
+
+    // 添加事件监听
+    document.addEventListener('env-vars-injected', handleEnvVarsInjected);
+    console.log('已添加env-vars-injected事件监听器');
+    
+    // 设置定时器，每5秒检查一次window上的环境变量
+    const intervalId = setInterval(() => {
+      if (typeof window !== 'undefined' && window.ENV_VITE_HUGGINGFACE_API_KEY) {
+        console.log('【定时检查】发现window上的环境变量已设置');
+        setDefaultApiKey(window.ENV_VITE_HUGGINGFACE_API_KEY);
+        clearInterval(intervalId); // 找到后停止检查
+      }
+    }, 5000);
+
+    // 清理函数
+    return () => {
+      document.removeEventListener('env-vars-injected', handleEnvVarsInjected);
+      clearInterval(intervalId);
+    };
+  }, []);
   const [provider, setProvider] = useState('novita');
   const [apiKey, setApiKey] = useState('');
   const [useDefaultKey, setUseDefaultKey] = useState(true);
@@ -205,7 +262,7 @@ export const WebsiteBuilderProvider = ({ children }) => {
     const inputToSend = customInput || userInput;
     if (!inputToSend || (typeof inputToSend === 'string' && !inputToSend.trim())) return;
     
-    const currentApiKey = getCurrentApiKey(DEFAULT_API_KEY, useDefaultKey, apiKey);
+    const currentApiKey = getCurrentApiKey(defaultApiKey, useDefaultKey, apiKey);
     if (!currentApiKey) {
       setSnackbarMessage('Please set a valid API key');
       setSnackbarOpen(true);
@@ -385,7 +442,7 @@ export const WebsiteBuilderProvider = ({ children }) => {
   
   // 在WebsiteBuilderProvider组件中
   const handleSaveApiKey = () => {
-    const keyToSave = useDefaultKey ? DEFAULT_API_KEY : apiKey.trim();
+    const keyToSave = useDefaultKey ? defaultApiKey : apiKey.trim();
     if (keyToSave) {
       const success = saveApiKey(keyToSave);
       if (success) {

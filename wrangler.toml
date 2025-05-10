@@ -8,6 +8,16 @@ routes = [
   { pattern = "cdtools.org/*", zone_name = "cdtools.org" }
 ]
 
+
+
+# 显式绑定环境变量，确保在Workers中可用
+# 这是关键配置，它明确告诉Cloudflare将Dashboard中的环境变量暴露给Workers
+[env.production]
+vars = { VITE_HUGGINGFACE_API_KEY = "" } # 这里的值会被Dashboard中的设置覆盖
+
+[env.staging]
+vars = { VITE_HUGGINGFACE_API_KEY = "" }
+
 [site]
 bucket = "./dist"
 entry-point = "workers-site"
