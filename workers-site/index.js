@@ -3,24 +3,51 @@ import { getAssetFromKV } from '@cloudflare/kv-asset-handler'
 /**
  * 处理请求的事件监听器
  */
+// 使用最新的Cloudflare Workers API
+export default {
+  // 使用新的fetch处理器格式，环境变量直接作为第二个参数传入
+  async fetch(request, env, ctx) {
+    try {
+      return await handleEvent({ request, env }, env);
+    } catch (e) {
+      console.error('Error handling request:', e);
+      return new Response('Internal Error: ' + e.message, { status: 500 });
+    }
+  }
+};
+
+// 保留旧的事件处理程序作为备用，这样可以在任何部署环境中工作
 addEventListener('fetch', event => {
   try {
-    event.respondWith(handleEvent(event, event.env))
+    // 确保环境变量被正确传递
+    event.respondWith(handleEvent(event, event.env || {}))
   } catch (e) {
-    event.respondWith(new Response('Internal Error', { status: 500 }))
+    console.error('Error in fetch event handler:', e);
+    event.respondWith(new Response('Internal Error: ' + e.message, { status: 500 }))
   }
 })
 
 /**
- * 从KV存储中获取静态资产并响应
- * @param {FetchEvent} event
+ * 从 KV 存储中获取静态资产并响应
+ * @param {object} event - 可能是FetchEvent或包含{ request, env }的对象
+ * @param {object} env - 环境变量对象
  */
 async function handleEvent(event, env) {
-  const url = new URL(event.request.url)
+  // 增加日志以检查环境变量
+  console.log('Environment variables availability check:', {
+    hasEnv: !!env,
+    envKeys: env ? Object.keys(env).join(', ') : 'none',
+    hasApiKey: env && !!env.VITE_HUGGINGFACE_API_KEY,
+    apiKeyLength: env && env.VITE_HUGGINGFACE_API_KEY ? env.VITE_HUGGINGFACE_API_KEY.length : 0
+  });
+  
+  // 兼容两种 API 格式
+  const request = event.request || event;
+  const url = new URL(request.url)
   
   // 处理 API 请求
-  if (url.pathname === '/api/analyze-website' && event.request.method === 'POST') {
-    return handleAnalyzeWebsite(event.request, env)
+  if (url.pathname === '/api/analyze-website' && request.method === 'POST') {
+    return handleAnalyzeWebsite(request, env)
   }
   
   // 特殊处理 Google 验证文件
@@ -31,8 +58,15 @@ async function handleEvent(event, env) {
   }
   
   try {
-    // 尝试从KV存储获取静态资产
-    return await getAssetFromKV(event)
+    // 创建兼容两种 API 格式的事件对象
+    const assetEvent = {
+      request,
+      waitUntil: event.waitUntil ? (promise) => event.waitUntil(promise) : () => {},
+      passThroughOnException: event.passThroughOnException ? () => event.passThroughOnException() : () => {}
+    };
+    
+    // 尝试从 KV 存储获取静态资产
+    return await getAssetFromKV(assetEvent)
   } catch (e) {
     // 如果资产不存在，检查是否是客户端路由
     const isStaticAsset = url.pathname.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/i);
@@ -40,11 +74,45 @@ async function handleEvent(event, env) {
     if (!isStaticAsset) {
       // 对于客户端路由，返回 index.html
       try {
-        const indexResponse = await getAssetFromKV(event, {
+        // 创建兼容的事件对象
+        const assetEvent = {
+          request,
+          waitUntil: event.waitUntil ? (promise) => event.waitUntil(promise) : () => {},
+          passThroughOnException: event.passThroughOnException ? () => event.passThroughOnException() : () => {}
+        };
+        
+        const indexResponse = await getAssetFromKV(assetEvent, {
           mapRequestToAsset: req => new Request(`${new URL(req.url).origin}/index.html`, req)
         });
         
-        const response = new Response(indexResponse.body, indexResponse);
+        // 读取HTML内容
+        let htmlContent = await indexResponse.text();
+        
+        // 注入环境变量到前端 - 更完整的错误处理
+        let apiKey = '';
+        try {
+          apiKey = env && env.VITE_HUGGINGFACE_API_KEY ? env.VITE_HUGGINGFACE_API_KEY : '';
+          console.log(`API key ${apiKey ? 'found' : 'not found'} in environment variables`);
+        } catch (e) {
+          console.error('Error accessing environment variables:', e);
+        }
+        
+        const envVarsScript = `
+        <script>
+          window.ENV_VITE_HUGGINGFACE_API_KEY = "${apiKey}";
+          console.log('Environment variables injected by Cloudflare Workers', { 
+            hasApiKey: ${!!apiKey}, 
+            apiKeyLength: ${apiKey.length} 
+          });
+        </script>
+        `;
+        
+        // 在</head>前插入脚本
+        htmlContent = htmlContent.replace('</head>', `${envVarsScript}</head>`);
+        
+        const response = new Response(htmlContent, {
+          headers: indexResponse.headers
+        });
         response.headers.set('Cache-Control', 'no-cache');
         return response;
       } catch (error) {
@@ -104,7 +172,51 @@ function extractTextFromHtml(html) {
 
 // 使用 Hugging Face API 分析内容
 async function analyzeWithHuggingFace(textContent, url, env) {
-  const HF_API_KEY = env.VITE_HUGGINGFACE_API_KEY;
+  // 详细记录环境变量情况
+  console.log('analyzeWithHuggingFace env check:', {
+    hasEnv: !!env,
+    envType: typeof env,
+    envKeys: env && typeof env === 'object' ? Object.keys(env).join(', ') : 'not an object',
+  });
+  
+  // 尝试多种方式获取API Key
+  let HF_API_KEY = '';
+  
+  try {
+    // 方法1: 直接从env对象获取
+    if (env && env.VITE_HUGGINGFACE_API_KEY) {
+      HF_API_KEY = env.VITE_HUGGINGFACE_API_KEY;
+      console.log('API key found in env.VITE_HUGGINGFACE_API_KEY');
+    } 
+    // 方法2: 通过环境变量名称获取
+    else if (env && env.HUGGINGFACE_API_KEY) {
+      HF_API_KEY = env.HUGGINGFACE_API_KEY;
+      console.log('API key found in env.HUGGINGFACE_API_KEY');
+    }
+    // 方法3: 尝试通过process.env获取(不太可能在Workers中工作，但作为后备)
+    else if (typeof process !== 'undefined' && process.env && process.env.VITE_HUGGINGFACE_API_KEY) {
+      HF_API_KEY = process.env.VITE_HUGGINGFACE_API_KEY;
+      console.log('API key found in process.env.VITE_HUGGINGFACE_API_KEY');
+    }
+    // 方法4: 为了调试，打印所有可用的环境变量
+    else {
+      console.log('No API key found in any environment variable');
+      if (env && typeof env === 'object') {
+        console.log('Available env keys:', Object.keys(env));
+      }
+    }
+  } catch (e) {
+    console.error('Error accessing environment variables:', e);
+  }
+  
+  if (!HF_API_KEY) {
+    console.error('Missing Hugging Face API Key in all checked environment variables');
+    return {
+      description: "API key not configured",
+      keywords: ["configuration error"],
+      summary: "Please set the HUGGINGFACE_API_KEY or VITE_HUGGINGFACE_API_KEY environment variable in your Cloudflare Workers settings."
+    };
+  }
   
   const prompt = `
 请分析以下网站内容，并提供：
@@ -138,7 +250,7 @@ ${textContent}
 
   if (!response.ok) {
     const error = await response.text();
-    throw new Error(`Hugging Face API 错误: ${error}`);
+    throw new Error(`Hugging Face API error: ${error}`);
   }
 
   const result = await response.json();
@@ -157,16 +269,16 @@ ${textContent}
     }
     
     return {
-      description: "无法解析模型输出",
-      keywords: ["无关键词"],
+      description: "Unable to parse model output",
+      keywords: ["parsing error"],
       summary: outputText.substring(0, 500)
     };
   } catch (error) {
-    console.error("解析模型输出时出错:", error);
+    console.error("Error parsing model output:", error);
     return {
-      description: "网站分析器遇到问题",
-      keywords: ["解析错误"],
-      summary: "无法解析模型返回的结果。"
+      description: "Website analyzer encountered an issue",
+      keywords: ["parsing error"],
+      summary: "Unable to parse the result returned by the model."
     };
   }
 }

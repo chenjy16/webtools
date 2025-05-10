@@ -58,10 +58,37 @@ export const WebsiteBuilderProvider = ({ children }) => {
   const [currentProjectName, setCurrentProjectName] = useState('');
   const [projectDialogOpen, setProjectDialogOpen] = useState(false);
   
-  // API 相关状态
-  const DEFAULT_API_KEY = typeof import.meta !== 'undefined' && import.meta.env ? 
-    import.meta.env.VITE_HUGGINGFACE_API_KEY || "" : 
-    window.ENV_VITE_HUGGINGFACE_API_KEY || "";
+  // API 相关状态 - 增强环境变量获取逻辑
+  // 按优先级顺序尝试不同的环境变量来源
+  const getDefaultApiKey = () => {
+    // 1. 首先检查window上是否有Cloudflare Workers注入的环境变量
+    if (typeof window !== 'undefined' && window.ENV_VITE_HUGGINGFACE_API_KEY) {
+      console.log('Using API key from Cloudflare Workers injected environment');
+      return window.ENV_VITE_HUGGINGFACE_API_KEY;
+    }
+    
+    // 2. 尝试从Vite环境变量获取
+    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_HUGGINGFACE_API_KEY) {
+      console.log('Using API key from Vite environment');
+      return import.meta.env.VITE_HUGGINGFACE_API_KEY;
+    }
+    
+    // 3. 从localStorage尝试获取之前保存的值
+    try {
+      const savedKey = localStorage.getItem('huggingface_api_key');
+      if (savedKey) {
+        console.log('Using API key from localStorage');
+        return savedKey;
+      }
+    } catch (e) {
+      console.log('Unable to access localStorage');
+    }
+    
+    console.log('No API key found in environment variables or storage');
+    return "";
+  };
+  
+  const DEFAULT_API_KEY = getDefaultApiKey();
   const [provider, setProvider] = useState('novita');
   const [apiKey, setApiKey] = useState('');
   const [useDefaultKey, setUseDefaultKey] = useState(true);
