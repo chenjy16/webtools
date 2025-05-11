@@ -1,5 +1,4 @@
 import React, { createContext, useState, useContext, useRef, useEffect } from 'react';
-import { generateWebsiteHtml } from '../services/HtmlGenerator.jsx';
 import { getCurrentApiKey, saveApiKey, checkApiKey } from '../services/StorageService';
 import { sendChatMessage, streamChatMessage } from '../services/AIService';
 
@@ -78,7 +77,8 @@ export const WebsiteBuilderProvider = ({ children }) => {
     
     // 3. 从本地存储尝试获取之前保存的值
     try {
-      const savedKey = localStorage.getItem('huggingface_api_key');
+      // 使用与saveApiKey函数相同的键名'website_builder_api_key'
+      const savedKey = localStorage.getItem('website_builder_api_key');
       if (savedKey) {
         console.log('Using API key from localStorage');
         return savedKey;
@@ -93,49 +93,23 @@ export const WebsiteBuilderProvider = ({ children }) => {
   
   // 在组件挂载时获取一次API Key
   useEffect(() => {
-    // 立即打印调试信息，检查各种环境变量来源
-    console.log('【环境变量调试】');
-    console.log('window对象上的环境变量:', typeof window !== 'undefined' ? window.ENV_VITE_HUGGINGFACE_API_KEY : 'window未定义');
-    console.log('Vite环境变量:', typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_HUGGINGFACE_API_KEY : 'import.meta未定义');
-    
-    try {
-      console.log('localStorage中的API Key:', localStorage.getItem('huggingface_api_key'));
-    } catch (e) {
-      console.log('无法访问localStorage');
-    }
-    
     // 首次获取API Key
     const initialApiKey = getDefaultApiKey();
-    console.log('初始获取的API Key:', initialApiKey || '未获取到');
     setDefaultApiKey(initialApiKey);
 
     // 添加事件监听器来检测环境变量注入
     const handleEnvVarsInjected = (event) => {
-      console.log('【环境变量注入事件被触发】', event.detail);
-      
-      // 再次检查window上的环境变量
-      if (typeof window !== 'undefined') {
-        console.log('事件触发后window上的环境变量:', window.ENV_VITE_HUGGINGFACE_API_KEY || '未设置');
-        
-        if (window.ENV_VITE_HUGGINGFACE_API_KEY) {
-          console.log('从注入的环境变量更新API key');
-          setDefaultApiKey(window.ENV_VITE_HUGGINGFACE_API_KEY);
-          // 更新后，再次打印状态以确认
-          setTimeout(() => {
-            console.log('更新后的defaultApiKey状态:', defaultApiKey);
-          }, 100);
-        }
+      if (typeof window !== 'undefined' && window.ENV_VITE_HUGGINGFACE_API_KEY) {
+        setDefaultApiKey(window.ENV_VITE_HUGGINGFACE_API_KEY);
       }
     };
 
     // 添加事件监听
     document.addEventListener('env-vars-injected', handleEnvVarsInjected);
-    console.log('已添加env-vars-injected事件监听器');
     
     // 设置定时器，每5秒检查一次window上的环境变量
     const intervalId = setInterval(() => {
       if (typeof window !== 'undefined' && window.ENV_VITE_HUGGINGFACE_API_KEY) {
-        console.log('【定时检查】发现window上的环境变量已设置');
         setDefaultApiKey(window.ENV_VITE_HUGGINGFACE_API_KEY);
         clearInterval(intervalId); // 找到后停止检查
       }
@@ -166,10 +140,7 @@ export const WebsiteBuilderProvider = ({ children }) => {
     }
   }, []);
   
-  // 处理使用预制提示词模板
-  const handleUseTemplate = (template) => {
-    setUserInput(template);
-  };
+
   
   // 增强网站信息提取功能
   const extractWebsiteInfoFromChat = (messages) => {
@@ -317,11 +288,9 @@ export const WebsiteBuilderProvider = ({ children }) => {
       
       // 获取详细的错误信息
       let errorMessage = error.message || '未知错误';
-      let errorDetails = '';
       
       // 处理API错误
       if (error.isApiError) {
-        errorDetails = `状态码: ${error.statusCode || '未知'}`;
         
         // 根据错误类型提供更具体的提示
         if (errorMessage.includes('authentication')) {
@@ -338,7 +307,7 @@ export const WebsiteBuilderProvider = ({ children }) => {
         ...updatedMessages,
         { 
           isUser: false, 
-          text: `网站生成失败: ${errorMessage}${errorDetails ? `\n${errorDetails}` : ''}\n请检查您的API密钥或稍后再试。` 
+          text: `网站生成失败: ${errorMessage}\n请检查您的API密钥或稍后再试。` 
         }
       ]);
       
@@ -374,7 +343,6 @@ export const WebsiteBuilderProvider = ({ children }) => {
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
     } catch (error) {
-      console.error('Failed to save project:', error);
       setSnackbarMessage(`保存项目失败: ${error.message}`);
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
@@ -422,8 +390,7 @@ export const WebsiteBuilderProvider = ({ children }) => {
           setSnackbarMessage('HTML code copied to clipboard');
           setSnackbarOpen(true);
         })
-        .catch(err => {
-          console.error('Copy failed:', err);
+        .catch(() => {
           setSnackbarMessage('Copy failed, please copy manually');
           setSnackbarOpen(true);
         });
@@ -473,8 +440,9 @@ export const WebsiteBuilderProvider = ({ children }) => {
   };
   
   // 在WebsiteBuilderProvider组件中
-  const handleSaveApiKey = () => {
-    const keyToSave = useDefaultKey ? defaultApiKey : apiKey.trim();
+  const handleSaveApiKey = (customApiKey) => {
+    // 如果提供了自定义API密钥参数，则使用它，否则根据useDefaultKey决定使用哪个密钥
+    const keyToSave = customApiKey || (useDefaultKey ? defaultApiKey : apiKey.trim());
     if (keyToSave) {
       const success = saveApiKey(keyToSave);
       if (success) {
@@ -503,10 +471,7 @@ export const WebsiteBuilderProvider = ({ children }) => {
     setSnackbarSeverity('success');
   };
   
-  // 切换实时预览
-  const toggleLivePreview = () => {
-    setLivePreviewEnabled(!livePreviewEnabled);
-  };
+
   
   return (
     <WebsiteBuilderContext.Provider value={{
@@ -523,7 +488,6 @@ export const WebsiteBuilderProvider = ({ children }) => {
       setUserInput,
       isChatLoading,
       handleSendMessage,
-      handleUseTemplate,
       chatEndRef,
       
       // 流式响应相关
@@ -568,8 +532,7 @@ export const WebsiteBuilderProvider = ({ children }) => {
       snackbarSeverity,
       setSnackbarSeverity,
       handleSnackbarClose,
-      livePreviewEnabled,
-      toggleLivePreview
+      livePreviewEnabled
     }}>
       {children}
     </WebsiteBuilderContext.Provider>

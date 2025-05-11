@@ -35,9 +35,6 @@ export const checkApiKey = async (apiKey) => {
   if (!apiKey) return false;
   
   try {
-    // 这里可以添加实际的 API 密钥验证逻辑
-    // 例如，发送一个简单的请求到 Hugging Face API
-    // 为简化示例，这里只检查密钥长度是否合理
     return apiKey.length > 8;
   } catch (error) {
     console.error('Failed to verify API key:', error);

@@ -72,7 +72,7 @@ export const sendChatMessage = async (
     console.error(`Error details: Status code ${statusCode}, Message: ${errorMessage}`);
     
     // 构建更详细的错误对象，包含状态码和原始错误
-    const enhancedError = new Error(`AI生成失败: ${errorMessage}`);
+    const enhancedError = new Error(`AI generation failed: ${errorMessage}`);
     enhancedError.statusCode = statusCode;
     enhancedError.originalError = error;
     enhancedError.isApiError = true;
@@ -135,7 +135,7 @@ export const streamChatMessage = async (
     console.error(`Error details: Status code ${statusCode}, Message: ${errorMessage}`);
     
     // 构建更详细的错误对象，包含状态码和原始错误
-    const enhancedError = new Error(`AI流式生成失败: ${errorMessage}`);
+    const enhancedError = new Error(`AI streaming generation failed: ${errorMessage}`);
     enhancedError.statusCode = statusCode;
     enhancedError.originalError = error;
     enhancedError.isApiError = true;

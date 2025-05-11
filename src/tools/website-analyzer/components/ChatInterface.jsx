@@ -1,12 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  Box, TextField, Button, Paper, Typography, 
-  IconButton, CircularProgress
+  Box, TextField, Button, CircularProgress
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import { useWebsiteBuilder } from '../context/WebsiteBuilderContext';
-import { StyledScrollBox } from './StyledComponents';
-import ChatMessage from './ChatMessage';
 
 function ChatInterface() {
   // 确保从 context 中解构的值有默认值，防止 undefined 错误

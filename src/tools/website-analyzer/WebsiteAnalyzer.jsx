@@ -5,7 +5,7 @@ import { WebsiteBuilderProvider } from './context/WebsiteBuilderContext';
 import ChatInterface from './components/ChatInterface';
 import PreviewDialog from './components/PreviewDialog';
 import SettingsDialog from './components/SettingsDialog';
-import ProjectDialog from './components/ProjectDialog'; // Import ProjectDialog component
+import ProjectDialog from './components/ProjectDialog';
 import { useWebsiteBuilder } from './context/WebsiteBuilderContext';
 // Import syntax highlighting components
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';

@@ -17,7 +17,6 @@ const toolCategories = [
       { name: 'PDF Tools 🔥', path: '/pdf-tools' },
       { name: 'Unit Converter ', path: '/unit-converter' },
       { name: 'Color Converter ', path: '/color-converter' },
-      { name: 'Date Calculator ', path: '/date-calculator' },
       { name: 'Timer ', path: '/timer' },
       { name: 'public holidays', path: '/public-holidays' },
       { name: 'Country Info', path: '/country-info' },
