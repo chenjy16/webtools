@@ -244,6 +244,14 @@ const PreviewComponent = () => {
 
 // WebsiteContent component needs to be used inside WebsiteBuilderProvider
 const WebsiteContent = () => {
+  // 从上下文获取Snackbar相关状态
+  const { 
+    snackbarOpen, 
+    snackbarMessage, 
+    snackbarSeverity = 'info', // 默认为info类型
+    handleSnackbarClose 
+  } = useWebsiteBuilder() || {};
+  
   return (
     <Box sx={{ 
       width: '100%', 
@@ -252,6 +260,22 @@ const WebsiteContent = () => {
       p: { xs: 1, sm: 2, md: 3 },
       boxSizing: 'border-box'
     }}>
+      {/* 全局错误提示Snackbar */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={handleSnackbarClose} 
+          severity={snackbarSeverity} 
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
       {/* API Key 提示信息 */}
       <Box sx={{ mb: 2, p: 2, bgcolor: '#fffbe6', border: '1px solid #ffe58f', borderRadius: 2 }}>
         <Typography variant="body1" sx={{ color: '#ad8b00', fontWeight: 500 }}>

@@ -50,6 +50,7 @@ export const WebsiteBuilderProvider = ({ children }) => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 添加消息类型：success, error, warning, info
   // 移除实时预览功能，默认设置为false
   const [livePreviewEnabled, setLivePreviewEnabled] = useState(false);
   
@@ -264,7 +265,8 @@ export const WebsiteBuilderProvider = ({ children }) => {
     
     const currentApiKey = getCurrentApiKey(defaultApiKey, useDefaultKey, apiKey);
     if (!currentApiKey) {
-      setSnackbarMessage('Please set a valid API key');
+      setSnackbarMessage('请设置有效的API密钥');
+      setSnackbarSeverity('error');
       setSnackbarOpen(true);
       return;
     }
@@ -312,15 +314,37 @@ export const WebsiteBuilderProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Failed to send message:", error);
+      
+      // 获取详细的错误信息
+      let errorMessage = error.message || '未知错误';
+      let errorDetails = '';
+      
+      // 处理API错误
+      if (error.isApiError) {
+        errorDetails = `状态码: ${error.statusCode || '未知'}`;
+        
+        // 根据错误类型提供更具体的提示
+        if (errorMessage.includes('authentication')) {
+          errorMessage = 'API密钥验证失败，请检查您的API密钥是否正确';
+        } else if (errorMessage.includes('rate limit') || errorMessage.includes('quota')) {
+          errorMessage = 'API调用次数已达上限，请稍后再试';
+        } else if (errorMessage.includes('timeout')) {
+          errorMessage = 'API请求超时，请稍后再试';
+        }
+      }
+      
       // 添加错误消息到聊天
       setChatMessages([
         ...updatedMessages,
         { 
           isUser: false, 
-          text: `Error generating website: ${error.message}. Please check your API key or try again later.` 
+          text: `网站生成失败: ${errorMessage}${errorDetails ? `\n${errorDetails}` : ''}\n请检查您的API密钥或稍后再试。` 
         }
       ]);
-      setSnackbarMessage(`Error generating website: ${error.message}`);
+      
+      // 显示错误提示
+      setSnackbarMessage(errorMessage);
+      setSnackbarSeverity('error');
       setSnackbarOpen(true);
     } finally {
       setChatLoading(false);
@@ -340,13 +364,21 @@ export const WebsiteBuilderProvider = ({ children }) => {
       chatMessages
     };
     
-    const updatedProjects = [...savedProjects, newProject];
-    setSavedProjects(updatedProjects);
-    localStorage.setItem('savedProjects', JSON.stringify(updatedProjects));
-    
-    setCurrentProjectName(newProject.name);
-    setSnackbarMessage(`Project "${newProject.name}" saved`);
-    setSnackbarOpen(true);
+    try {
+      const updatedProjects = [...savedProjects, newProject];
+      setSavedProjects(updatedProjects);
+      localStorage.setItem('savedProjects', JSON.stringify(updatedProjects));
+      
+      setCurrentProjectName(newProject.name);
+      setSnackbarMessage(`项目 "${newProject.name}" 已保存`);
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error('Failed to save project:', error);
+      setSnackbarMessage(`保存项目失败: ${error.message}`);
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    }
   };
   
   // 加载项目
@@ -467,6 +499,8 @@ export const WebsiteBuilderProvider = ({ children }) => {
   // 处理 Snackbar
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
+    // 重置消息类型为默认值
+    setSnackbarSeverity('success');
   };
   
   // 切换实时预览
@@ -531,6 +565,8 @@ export const WebsiteBuilderProvider = ({ children }) => {
       // UI 相关
       snackbarOpen,
       snackbarMessage,
+      snackbarSeverity,
+      setSnackbarSeverity,
       handleSnackbarClose,
       livePreviewEnabled,
       toggleLivePreview

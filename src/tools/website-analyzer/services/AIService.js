@@ -70,7 +70,13 @@ export const sendChatMessage = async (
     const errorMessage = error.message || "Unknown error";
     const statusCode = error.status || "No status code";
     console.error(`Error details: Status code ${statusCode}, Message: ${errorMessage}`);
-    throw new Error(`AI generation failed: ${errorMessage}`);
+    
+    // 构建更详细的错误对象，包含状态码和原始错误
+    const enhancedError = new Error(`AI生成失败: ${errorMessage}`);
+    enhancedError.statusCode = statusCode;
+    enhancedError.originalError = error;
+    enhancedError.isApiError = true;
+    throw enhancedError;
   }
 };
 
@@ -124,6 +130,15 @@ export const streamChatMessage = async (
     return extractHtml(fullResponse);
   } catch (error) {
     console.error("Streaming AI API call failed:", error);
-    throw error;
+    const errorMessage = error.message || "Unknown error";
+    const statusCode = error.status || "No status code";
+    console.error(`Error details: Status code ${statusCode}, Message: ${errorMessage}`);
+    
+    // 构建更详细的错误对象，包含状态码和原始错误
+    const enhancedError = new Error(`AI流式生成失败: ${errorMessage}`);
+    enhancedError.statusCode = statusCode;
+    enhancedError.originalError = error;
+    enhancedError.isApiError = true;
+    throw enhancedError;
   }
 };
