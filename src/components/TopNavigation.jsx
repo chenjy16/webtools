@@ -56,6 +56,7 @@ const toolCategories = [
     tools: [
       { name: 'AI Website Builder 🔥', path: '/website-analyzer' },
       { name: 'AI Information Generator 🔥', path: '/fake-data-generator' },
+      { name: 'AI Image Generator 🔥', path: '/image-generation' },
     ]
   },
 

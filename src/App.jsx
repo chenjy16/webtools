@@ -13,7 +13,9 @@ import DnsLookup from './tools/dns-lookup/DnsLookup';
 import SpeedTest from './tools/speed-test/SpeedTest';
 import ApiTester from './tools/api-tester/ApiTester'; // 导入 ApiTester 组件
 import WebsiteAnalyzer from './tools/website-analyzer/WebsiteAnalyzer';
-
+import ImageGeneration from './tools/image-generation/ImageGenerationPanel';
+// 在App.jsx或路由配置文件中添加
+import TermsAndConditions from './pages/TermsAndConditions';
 // 添加网络延迟测试工具组件导入
 const NetworkLatency = lazy(() => import('./tools/network-latency/NetworkLatency'));
 
@@ -55,7 +57,8 @@ const CronGenerator = lazy(() => import('./tools/cron-generator/CronGenerator'))
 const SnakeGame = lazy(() => import('./tools/games/snake/SnakeGame'));
 const TetrisGame = lazy(() => import('./tools/games/tetris/TetrisGame'));
 const StreamVideos=lazy(() => import('./tools/stream-videos/StreamVideos'));
-
+// 在路由配置中添加
+<Route path="/terms-and-conditions" element={<TermsAndConditions />} />
 
 function App() {
   const [mode, setMode] = useState('light');
@@ -116,6 +119,8 @@ function App() {
             <Route path="/api-tester" element={<ApiTester />} />
             {/* 新增 AI 网站分析工具路由 */}
             <Route path="/website-analyzer" element={<WebsiteAnalyzer />} />
+            <Route path="/image-generation" element={<ImageGeneration />} />
+            <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
           </Route>
         </Routes>
       </Suspense>
