@@ -121,7 +121,22 @@ const TermsAndConditions = () => {
         
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" gutterBottom>
-            11. Contact Information
+            11. Refund Policy
+          </Typography>
+          <Typography variant="body1" paragraph>
+            We offer refunds in accordance with Paddle's 14-day refund policy for all purchases made through our platform. If you are not satisfied with your purchase, you may request a refund within 14 days of the purchase date.
+          </Typography>
+          <Typography variant="body1" paragraph>
+            To request a refund, please contact our customer support team with your order details. Refunds will be processed through the same payment method used for the original purchase.
+          </Typography>
+          <Typography variant="body1" paragraph>
+            Please note that certain products or services may have specific refund conditions, which will be clearly communicated at the time of purchase. We reserve the right to deny refund requests that do not comply with our refund policy or that we determine to be abusive or fraudulent.
+          </Typography>
+        </Box>
+        
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            12. Contact Information
           </Typography>
           <Typography variant="body1" paragraph>
             If you have any questions about these Terms and Conditions, please contact us through the contact information provided on our website.

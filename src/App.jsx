@@ -18,6 +18,7 @@ import ImageGeneration from './tools/image-generation/ImageGenerationPanel';
 import TermsAndConditions from './pages/TermsAndConditions';
 // 添加网络延迟测试工具组件导入
 const NetworkLatency = lazy(() => import('./tools/network-latency/NetworkLatency'));
+import Pricing from './pages/Pricing';
 
 
 // 懒加载各个工具组件
@@ -121,6 +122,7 @@ function App() {
             <Route path="/website-analyzer" element={<WebsiteAnalyzer />} />
             <Route path="/image-generation" element={<ImageGeneration />} />
             <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+            <Route path="/pricing" element={<Pricing />} />
           </Route>
         </Routes>
       </Suspense>

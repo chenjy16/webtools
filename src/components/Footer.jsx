@@ -16,6 +16,7 @@ export default function Footer() {
         <Stack spacing={1} sx={{ textAlign: 'center', mb: 1 }}>
           <Typography variant="body2" color="text.secondary">
             Free Online Tools | <Link href="/terms-and-conditions" style={{ color: 'inherit', textDecoration: 'none', marginLeft: '10px' }}>Terms & Conditions</Link>
+         | <Link href="/pricing" style={{ color: 'inherit', textDecoration: 'none', marginLeft: '10px' }}>pricing</Link>
           </Typography>
           <Typography variant="caption" color="text.disabled">
             © Tool.blog {new Date().getFullYear()} | <Link href="/about" color="inherit" underline="hover">About Us</Link>
