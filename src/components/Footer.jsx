@@ -1,4 +1,5 @@
-import { Box, Typography, Link, Stack, Container } from '@mui/material';
+import { Box, Typography, Stack, Container } from '@mui/material';
+import { Link as MuiLink } from '@mui/material';
 
 export default function Footer() {
   return (
@@ -15,11 +16,10 @@ export default function Footer() {
       <Container maxWidth="lg">
         <Stack spacing={1} sx={{ textAlign: 'center', mb: 1 }}>
           <Typography variant="body2" color="text.secondary">
-            Free Online Tools | <Link href="/terms-and-conditions" style={{ color: 'inherit', textDecoration: 'none', marginLeft: '10px' }}>Terms & Conditions</Link>
-         | <Link href="/pricing" style={{ color: 'inherit', textDecoration: 'none', marginLeft: '10px' }}>pricing</Link>
+            Free Online Tools | <MuiLink href="/terms-and-conditions" style={{ color: 'inherit', textDecoration: 'none', marginLeft: '10px' }}>Terms & Conditions</MuiLink>
           </Typography>
           <Typography variant="caption" color="text.disabled">
-            © Tool.blog {new Date().getFullYear()} | <Link href="/about" color="inherit" underline="hover">About Us</Link>
+            © Tool.blog {new Date().getFullYear()} | <MuiLink href="/about" color="inherit" underline="hover">About Us</MuiLink>
           </Typography>
         </Stack>
       </Container>

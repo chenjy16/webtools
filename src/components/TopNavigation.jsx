@@ -66,14 +66,7 @@ const toolCategories = [
       { name: 'Snake Game', path: '/games/snake' },
       { name: 'Tetris', path: '/games/tetris' },
     ]
-  },
-  {
-    name: 'Navigation',
-    tools: [
-      { name: 'Stream Videos', path: '/stream-videos' }, // 添加Stream Videos选项
-      { name: 'Video Tools', path: '/video-tools' }, // 添加Video Tools选项
-    ]
-  },
+  }
 ];
 
 
